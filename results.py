@@ -10,7 +10,8 @@ class ResultsView(Gtk.VBox):
 
 	__gsignals__ = {
 		'update-request'	:	(GObject.SIGNAL_RUN_FIRST, None, (str, object, object, object)),
-		'selection-changed' :	(GObject.SIGNAL_RUN_FIRST, None, (str, object, object))
+		'selection-changed' :	(GObject.SIGNAL_RUN_FIRST, None, (str, object, object)),
+		'notify-status'		:	(GObject.SIGNAL_RUN_FIRST, None, (str,))
 	}
 	def __init__(self):
 		Gtk.VBox.__init__(self, False, 0)
@@ -153,8 +154,8 @@ class ResultsView(Gtk.VBox):
 			
 	def set_result_set(self, resultset):
 		self.resultset = resultset
+		if self.resultset.is_ready(): self._show_page()
 		self.resultset.connect('ready',self._on_data_ready)
-		self._show_page()
 		
 	def _on_next_page(self, src):
 		self.resultset.next_page()
@@ -169,10 +170,19 @@ class ResultsView(Gtk.VBox):
 		self.resultset.last_page()
 
 	def _show_page(self):
-		self.set_model(ModelUtil.build_document_model(self.resultset.pagedata))
+		
+		self.emit('notify-status','Building results view ...')
+		def _ready(model):
+			GLib.idle_add(self._on_model_ready, model)
+			
+		ModelUtil.build_document_model_async(self.resultset.pagedata, _ready)
+
+	def _on_model_ready(self, model):
+		self.set_model(model)
 		self._update_page_and_count()
 		self._update_actions()
-		
+		self.emit('notify-status','Done.')
+
 	def _on_data_ready(self, src):
 		GLib.idle_add(self._show_page)
 

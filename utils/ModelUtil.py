@@ -5,7 +5,7 @@ from gi.repository import Gtk,GObject,GtkSource,Pango,GLib
 import json
 from datetime import datetime
 from bson.objectid import ObjectId
-
+from threading import Thread
 
 class ModelIterator:
 	def __init__(self, model):
@@ -30,7 +30,6 @@ class ModelUtil:
 	@staticmethod
 	def build_document_model(cursor):
 		model = Gtk.TreeStore(object,object,bool)
-		
 		for obj in cursor:
 			if isinstance(obj,dict):
 				if '_id' in obj:
@@ -43,6 +42,15 @@ class ModelUtil:
 			else:
 				parent = model.append(None,(None,obj,False))
 		return model
+		
+	@staticmethod
+	def build_document_model_async(cursor, callback):
+		def _run():
+			model = ModelUtil.build_document_model(cursor)
+			callback(model)
+		
+		thread = Thread(target=_run)
+		thread.start()
 
 	@staticmethod
 	def do_append_obj(model,obj,parent):

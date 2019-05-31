@@ -25,6 +25,7 @@ class ResultSet(GObject.GObject):
 		self.pages = 0
 		self.collection = collection
 		self.last_op = last_op
+		self._ready = False
 		
 	def has_first(self):
 		return self.page > 0
@@ -57,9 +58,10 @@ class ResultSet(GObject.GObject):
 			self._update_page_data()
 
 	def _update_page_data(self):
-		
+		self._ready = False
 		def _do_run():
 			self._do_update_page_data()
+			self._ready = True
 			self.emit('ready')
 		
 		self.thread = threading.Thread(target=_do_run)
@@ -73,6 +75,9 @@ class ResultSet(GObject.GObject):
 
 	def generator(self):
 		pass
+
+	def is_ready(self):
+		return self._ready
 
 class CursorResultSet(ResultSet):
 	def __init__(self, data, last_op):

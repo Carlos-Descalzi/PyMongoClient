@@ -28,14 +28,14 @@ class SubprocessHandler:
 			self.log('Running command: %s' % ' '.join(command))
 			try:
 				self._pipe = Popen(command,stdout = PIPE, stderr = PIPE)
-				
-				alive = True
-				while alive:
+
+				return_codde = None
+
+				while return_code is None:
 					
 					self._pipe.poll()
 
-					if self._pipe.returncode is not None:
-						alive = False
+					return_code = self._pipe.returncode
 						
 					stdout, stderr = self._pipe.stdout,self._pipe.stderr
 						
@@ -45,6 +45,9 @@ class SubprocessHandler:
 						self.log(fobj.readline().strip())
 
 					time.sleep(.1)
+					
+				self.log('Exited with return code %s' % return_code)
+				
 			except Exception as e:
 				self.log('Error exporting: %s' % e.message)
 			

@@ -18,8 +18,8 @@ detect_indent_width=false
 indent_mode=2
 
 [project]
-name=mongoclient
-base_path=/home/carlos/Proyectos/mongoclient
+name=PyMongoClient
+base_path=/home/carlos/Proyectos/PyMongoClient
 description=
 file_patterns=
 
@@ -28,8 +28,13 @@ long_line_behaviour=1
 long_line_column=132
 
 [files]
-current_page=0
-FILE_NAME_0=484;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2Fmongoclient%2Fqueryeditor.py;0;4
+current_page=5
+FILE_NAME_0=5613;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Fresults.py;0;4
+FILE_NAME_1=281;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Futils%2Fjob.py;0;4
+FILE_NAME_2=1683;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Fqueryeditor.py;0;4
+FILE_NAME_3=0;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Fconnection%2Fconnection.py;0;4
+FILE_NAME_4=0;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Fdialogs%2Fexport.py;0;4
+FILE_NAME_5=0;Python;0;EUTF-8;1;1;0;%2Fhome%2Fcarlos%2FProyectos%2FPyMongoClient%2Fdialogs%2Fimportdialog.py;0;4
 
 [VTE]
 last_dir=/home/carlos

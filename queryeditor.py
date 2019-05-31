@@ -24,6 +24,7 @@ from bson.objectid import *
 class QueryEditor(Gtk.VBox):
 	def __init__(self,conn_obj):
 		Gtk.VBox.__init__(self,False,0)
+
 		self.conn_obj = conn_obj
 
 		self._updates = UpdatesHandler()
@@ -69,7 +70,12 @@ class QueryEditor(Gtk.VBox):
 
 		self.results.connect('update-request',self._on_update_field)
 		self.results.connect('selection-changed',self._on_selection_changed)
+		self.results.connect('notify-status',self._on_results_status)
 		self._update_results_actions()
+		
+		self.status_bar = Gtk.Statusbar()
+		self.pack_start(self.status_bar,False,False,0)
+		self.status_ctx = self.status_bar.get_context_id('')
 	####
 	def build_results_actions(self):
 		self.save_btn = GtkUtil.tool_button(Gtk.STOCK_SAVE,messages.BTN_EXPORT_DATA,self._save_results)
@@ -209,7 +215,7 @@ class QueryEditor(Gtk.VBox):
 				GLib._log('%s, at line %s' % (e.msg,e.lineno))
 			except Exception as e:
 				self._log(e.message)
-
+		self._set_status('Executing query ...')
 		self.conn_obj.execute_statement(statement)
 
 	def _log(self, message):
@@ -326,4 +332,9 @@ class QueryEditor(Gtk.VBox):
 		self._updates.set(collection, doc_id, field_path, value)
 		self._update_results_actions()
 
+	def _on_results_status(self, src, message):
+		self._set_status(message)
+
+	def _set_status(self, message):
 		
+		self.status_bar.push(self.status_ctx, message)
