@@ -2,7 +2,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk,GObject,GtkSource,Pango,GLib,Gdk
-from utils import *
+from utils import (
+	GtkUtil, 
+	ModelUtil
+)
 from widgets import *
 from dialogs import ExportDialog
 
@@ -104,7 +107,7 @@ class ResultsView(Gtk.VBox):
 		value = model.get(iter,1)[0]
 
 		type_str = ''
-		if isinstance(value,basestring):	type_str = 'String'
+		if isinstance(value,str):	type_str = 'String'
 		elif isinstance(value,bool): 		type_str = 'Boolean'
 		elif isinstance(value,int): 		type_str = 'Integer'
 		elif isinstance(value,dict): 		type_str = 'Object'

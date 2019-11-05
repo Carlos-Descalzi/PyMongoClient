@@ -2,9 +2,17 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk,GObject,GtkSource,Pango,GLib,Gdk
-from connection import *
-from utils import *
-from dialogs import *
+from connection import MongoConnection, CursorResultSet, ListResultSet
+from utils import (
+	GtkUtil,
+	ModelUtil,
+	JsonUtil
+)
+from dialogs import (
+	ExportDialog, 
+	FieldEditorDialog, 
+	ConfirmDialog
+)
 from results import ResultsView
 from crud import UpdatesHandler
 from collections import OrderedDict
@@ -187,7 +195,7 @@ class QueryEditor(Gtk.VBox):
 		def statement(db):
 			body = QUERY_TEMPLATE % query
 		
-			tf = tempfile.NamedTemporaryFile()
+			tf = tempfile.NamedTemporaryFile(mode='w')
 			tf.write(body)
 			tf.seek(0)
 			
@@ -196,7 +204,7 @@ class QueryEditor(Gtk.VBox):
 				'log'	:	self._log
 			}
 			try:
-				result = runpy.run_path(
+				_ = runpy.run_path(
 					tf.name,
 					init_globals=script_globals,
 					run_name='__main__'
@@ -214,7 +222,7 @@ class QueryEditor(Gtk.VBox):
 			except SyntaxError as e:
 				GLib._log('%s, at line %s' % (e.msg,e.lineno))
 			except Exception as e:
-				self._log(e.message)
+				self._log(str(e))
 		self._set_status('Executing query ...')
 		self.conn_obj.execute_statement(statement)
 
@@ -254,7 +262,6 @@ class QueryEditor(Gtk.VBox):
 		doc_id = path[0]
 		path = path[1:]
 		key = model.get_value(itr,0)
-		value = model.get_value(itr,1)	
 		collection = self.results.get_collection()
 
 		if isinstance(key,int):
@@ -319,7 +326,7 @@ class QueryEditor(Gtk.VBox):
 			try:
 				statement(db)
 			except Exception as e:
-				GLib.idle_add(self.feed_log, e.message)
+				GLib.idle_add(self.feed_log, str(e))
 			GLib.idle_add(self._allow_execute)
 			
 		self.execute_btn.set_sensitive(False)

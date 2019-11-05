@@ -84,10 +84,10 @@ class ExportDialog(GladeObject):
 			l = len(self._resultset.resultset)
 			row = data[0]
 			
-			fields = sorted(list(set(map(lambda x:'.'.join(x),self._do_extract_fields([],row)))))
+			fields = sorted(list(set(['.'.join(x) for x in self._do_extract_fields([],row)])))
 			
 			fields = [(True,'Select all')]+\
-				map(lambda x:(False,x),fields)
+				[(False,x) for x in fields]
 			for field in fields:
 				model.append(field)
 		
@@ -95,7 +95,7 @@ class ExportDialog(GladeObject):
 		
 	def _do_extract_fields(self, prefix, obj):
 		fields = []
-		for key, val in obj.items():
+		for key, val in list(obj.items()):
 			if isinstance(val,dict):
 				fields+=self._do_extract_fields([key], val)
 			elif isinstance(val,list):

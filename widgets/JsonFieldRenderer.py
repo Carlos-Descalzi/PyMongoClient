@@ -53,7 +53,7 @@ class FieldEditor(Gtk.HBox,Gtk.CellEditable):
 		self.editing_done()
 	
 	def _update_editor(self):
-		self_disable_signal = True
+		self._disable_signal = True
 		if self.value is None:
 			self._set_editor(self.null_editor)
 			self.type_chooser.set_active(0)
@@ -99,12 +99,12 @@ class FieldEditor(Gtk.HBox,Gtk.CellEditable):
 	def do_get_property(self, prop):
 		if prop.name == 'editing-canceled':
 			return False
-		raise AttributeError('unknown property %s' % name)
+		raise AttributeError('unknown property %s' % prop.name)
 		
 	def do_set_property(self, prop, val):
 		if prop.name == 'editing-canceled':
 			pass
-		raise AttributeError('unknown property %s' % name)
+		raise AttributeError('unknown property %s' % prop.name)
 		
 	def set_value(self, value):
 		self.value = value
@@ -142,7 +142,7 @@ class JsonFieldRenderer(Gtk.CellRendererText):
 		self.edit_state = (model, itr, value)
 		
 		if value is None or \
-			isinstance(value,(bool,int,basestring,float)):
+			isinstance(value,(bool,int,str,float)):
 			self.editor.set_value(value)
 			self.editor.set_size_request(cell.width,cell.height)
 			return self.editor

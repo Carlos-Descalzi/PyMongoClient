@@ -16,7 +16,7 @@ class ModelIterator:
 		self.itr = self.model.get_iter_first()
 		return self
 		
-	def next(self):
+	def __next__(self):
 		if not self.itr:
 			raise StopIteration()
 
@@ -54,7 +54,7 @@ class ModelUtil:
 
 	@staticmethod
 	def do_append_obj(model,obj,parent):
-		for key,val in obj.items():
+		for key,val in list(obj.items()):
 			if isinstance(val,dict):
 				child = model.append(parent,(key,val,False))
 				ModelUtil.do_append_obj(model,val,child)
@@ -67,11 +67,11 @@ class ModelUtil:
 			elif ModelUtil._is_primitive(val):
 				model.append(parent,(key,val,False))
 			else:
-				print 'UNKNOWN VAL',type(val),val
+				print('UNKNOWN VAL',type(val),val)
 				
 	@staticmethod
 	def _is_primitive(val):
-		return val is None or isinstance(val,(basestring,long,int,bool,datetime,ObjectId))
+		return val is None or isinstance(val,(str,int,bool,datetime,ObjectId))
 	
 	@staticmethod
 	def get_json_path(model, itr):

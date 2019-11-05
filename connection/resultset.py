@@ -99,7 +99,7 @@ class CursorResultSet(ResultSet):
 
 	def generator(self):
 		self.data.rewind()
-		for i in xrange(self.totalsize):
+		for i in range(self.totalsize):
 			doc = self.data[i]
 			yield doc
 

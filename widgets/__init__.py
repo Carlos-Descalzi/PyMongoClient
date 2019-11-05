@@ -1,1 +1,1 @@
-from JsonFieldRenderer import JsonFieldRenderer
+from .JsonFieldRenderer import JsonFieldRenderer

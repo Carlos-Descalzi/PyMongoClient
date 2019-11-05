@@ -9,16 +9,16 @@ class OperationSet:
 		self.pulls = {}
 
 	def build_sets(self):
-		return {p.path_str():v for p,v in self.sets.items()}
+		return {p.path_str():v for p,v in list(self.sets.items())}
 		
 	def build_pushes(self):
-		return {p.path_str():v for p,v in self.pushes.items()}
+		return {p.path_str():v for p,v in list(self.pushes.items())}
 		
 	def build_unsets(self):
-		return {p.path_str():v for p,v in self.unsets.items()}
+		return {p.path_str():v for p,v in list(self.unsets.items())}
 		
 	def build_pulls(self):
-		return {p.path_str():v for p,v in self.pulls.items()}
+		return {p.path_str():v for p,v in list(self.pulls.items())}
 
 class Path:
 	def __init__(self, path):
@@ -71,8 +71,8 @@ class UpdatesHandler:
 	def build_sentences(self):
 		sentences = []
 		
-		for collection, coll_updates in self._updates.items():
-			for doc_id, operations in coll_updates.items():
+		for collection, coll_updates in list(self._updates.items()):
+			for doc_id, operations in list(coll_updates.items()):
 
 				sets = operations.build_sets()
 				

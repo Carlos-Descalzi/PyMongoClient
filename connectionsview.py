@@ -3,7 +3,10 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk,GObject,GtkSource,Pango,GLib,Gdk
 from connection import MongoConnection
-from utils import *
+from utils import (
+	GtkUtil, 
+	ModelUtil
+)
 import json
 import os
 import os.path
@@ -141,7 +144,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 		connections = self._load_connections()
 		store = Gtk.TreeStore(object)
 
-		for key, data in connections.items():
+		for key, data in list(connections.items()):
 			self._add_new_conn_obj(store,key,data)
 
 		self.view.set_model(store)
@@ -197,7 +200,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 		GLib.idle_add(_notify)
 
 	def set_actions(self, actions):
-		for label, item in actions.items():
+		for label, item in list(actions.items()):
 			target, action = item
 			self._add_menu_item(label,target,action)
 
@@ -217,7 +220,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 		
 		if path is not None:
 			
-			for label, item in self._menu_actions.items():
+			for label, item in list(self._menu_actions.items()):
 				target, menu_item = item
 				
 				if label == 'Connect':
@@ -230,7 +233,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 					else:
 						menu_item.set_sensitive(True)
 		else:	
-			for item in self._menu_actions.values():
+			for item in list(self._menu_actions.values()):
 				target, menu_item = item
 				menu_item.set_sensitive(False)
 		

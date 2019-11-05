@@ -1,1 +1,1 @@
-from handler import UpdatesHandler
+from .handler import UpdatesHandler

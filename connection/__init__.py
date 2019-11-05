@@ -1,2 +1,2 @@
-from connection import MongoConnection
-from resultset import *
+from .connection import MongoConnection
+from .resultset import *

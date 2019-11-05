@@ -2,7 +2,9 @@ from threading import Thread
 from subprocess import Popen,PIPE
 import select
 import time
-class SubprocessHandler:
+from abc import ABCMeta, abstractmethod
+
+class SubprocessHandler(metaclass=ABCMeta):
 	
 	def __init__(self, listener):
 		self._listener = listener
@@ -18,10 +20,7 @@ class SubprocessHandler:
 	def start(self):
 		self._thread = Thread(target=self._run,args=(self._build_command_lines(),))
 		self._thread.start()
-		
-	def _build_command_line(self):
-		return []
-		
+	
 	def _run(self, commands):
 		
 		for command in commands:
@@ -29,8 +28,8 @@ class SubprocessHandler:
 			try:
 				self._pipe = Popen(command,stdout = PIPE, stderr = PIPE)
 
-				return_codde = None
-
+				return_code = None
+				
 				while return_code is None:
 					
 					self._pipe.poll()
@@ -49,7 +48,10 @@ class SubprocessHandler:
 				self.log('Exited with return code %s' % return_code)
 				
 			except Exception as e:
-				self.log('Error exporting: %s' % e.message)
+				self.log('Error exporting: %s' % e)
 			
 		self.finish()
 		
+	@abstractmethod
+	def _build_command_lines(self):
+		pass

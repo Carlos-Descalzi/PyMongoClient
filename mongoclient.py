@@ -6,9 +6,16 @@ from connection import MongoConnection
 from queryeditor import QueryEditor
 import json
 from dialogs import ConnectionEditorDialog
-from utils import *
-from dialogs import *
-from connection import *
+from utils import GladeObject, Templates
+from dialogs import (
+	ConfirmDialog,
+	AboutDialog,
+	ConnectionEditorDialog,
+	MessageDialog,
+	ImportDialog,
+	ExportDialog
+)
+from connection import MongoConnection
 from connectionsview import ConnectionsView
 from collections import OrderedDict
 import messages
@@ -49,7 +56,7 @@ class MainWindow(GladeObject):
 		Gtk.main_quit()
 
 	def close_all(self):
-		map(QueryEditor.close,self.connection_tabs)
+		list(map(QueryEditor.close,self.connection_tabs))
 
 	def show(self):
 		self.MainWindow.maximize()
@@ -82,7 +89,10 @@ class MainWindow(GladeObject):
 	def on_remove_connection(self,obj):
 		conn_obj = self.conn_view.get_selected_connection()
 
-		response = ConfirmDialog().show(MSG_WARNING, MSG_CONFIRM_DELETE_CONN)
+		response = ConfirmDialog().show(
+			messages.WARNING, 
+			messages.CONFIRM_DELETE_CONN
+		)
 		
 		if response == Gtk.ResponseType.OK:
 			self.conn_view.remove_connection(conn_obj)
@@ -117,11 +127,11 @@ class MainWindow(GladeObject):
 		self._on_connection_selected(None,conn_obj)
 		
 	def _show_indexes(self,*args):
-		conn, coll = tuple(self.conn_view.get_selected_path())
+		_, coll = tuple(self.conn_view.get_selected_path())
 		self._insert_in_current_editor(Templates.indexes(coll))
 		
 	def _find_all(self,*args):
-		conn, coll = tuple(self.conn_view.get_selected_path())
+		_, coll = tuple(self.conn_view.get_selected_path())
 		self._insert_in_current_editor(Templates.find_all(coll))
 
 	def _import_data(self, *args):

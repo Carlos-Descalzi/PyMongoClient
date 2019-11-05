@@ -1,23 +1,31 @@
+import json
+import runpy
+import subprocess
+import tempfile
+import threading
+import traceback
+from datetime import datetime
+
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
-from gi.repository import GObject
+
 import pymongo
-import runpy
-import tempfile
-import threading
-import json
 from bson.int64 import Int64
 from bson.objectid import ObjectId
-from datetime import datetime
-from resultset import *
-from wrapper import DatabaseWrapper
-import traceback
-import subprocess
+from gi.repository import GObject
+
+from .wrapper import DatabaseWrapper
+
 
 
 class Tunnel:
 	def __init__(self, config):
+		self.password = None
+		self.keyfile = None
+		self.port = None
+		self.user = None
+		self.host = None
 		self.__dict__.update(config)
 		self._transport = None
 		self._forwards = []
@@ -98,8 +106,8 @@ class MongoConnection(GObject.GObject):
 			self.db = db
 			self.emit('connected')
 		except Exception as e:
-			print e
-			print traceback.format_exc()
+			print(e)
+			print(traceback.format_exc())
 			if self.conn: self.conn.close()
 			self.conn = None
 			self.db = None
@@ -131,13 +139,6 @@ class MongoConnection(GObject.GObject):
 		hostlist = ','.join(['%(host)s:%(port)d' % item for item in conn_info])
 		return 'mongodb://%s@%s/%s' % (auth, hostlist, config['db'])
 
-	#def execute(self,query,callback):
-	#	if not self.is_connected():
-	#		raise Exception('Not connected')
-	#	thread = threading.Thread(target=self._do_execute,args=(query,callback))
-	#	thread.daemon = True
-	#	thread.start()
-			
 	def execute_statement(self,statement):
 		if not self.is_connected():
 			raise Exception('Not connected')
