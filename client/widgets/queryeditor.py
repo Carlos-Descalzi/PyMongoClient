@@ -219,7 +219,6 @@ class QueryEditor(Gtk.VBox):
 
                 GLib.idle_add(self.feed_output, resultset)
             except SyntaxError as e:
-                print(e)
                 self._log('%s, at line %s' % (e.msg, e.lineno))
             except Exception as e:
                 self._log(str(e))

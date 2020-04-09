@@ -67,7 +67,7 @@ class ModelUtil:
             elif ModelUtil._is_primitive(val):
                 model.append(parent, (key, val, False))
             else:
-                print('UNKNOWN VAL', type(val), val)
+                print('Unknown value', type(val), val)
 
     @staticmethod
     def _is_primitive(val):

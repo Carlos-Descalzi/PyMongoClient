@@ -3,7 +3,6 @@ import runpy
 import subprocess
 import tempfile
 import threading
-import traceback
 from datetime import datetime
 
 import gi
@@ -105,8 +104,6 @@ class MongoConnection(GObject.GObject):
             self.db = db
             self.emit('connected')
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
             if self.conn: self.conn.close()
             self.conn = None
             self.db = None

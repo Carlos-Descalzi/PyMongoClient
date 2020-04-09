@@ -4,7 +4,6 @@ import configparser
 
 class _Messages:
     def __init__(self):
-        print('INIT')
         locale = os.environ["LANG"].split(".")[0]
         lang = locale.split('_')[0]
 
