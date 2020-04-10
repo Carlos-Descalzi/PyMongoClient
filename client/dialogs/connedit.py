@@ -22,13 +22,36 @@ class ConnectionEditorDialog(GladeObject):
 
         renderer = Gtk.CellRendererText()
         renderer.set_property("editable", True)
+        renderer.connect('edited', self._on_host_edited)
         column = Gtk.TreeViewColumn("Host", renderer, text=0)
         column.set_min_width(300)
         self.replicaset.append_column(column)
-        renderer = Gtk.CellRendererText()
-        renderer.set_property("editable", True)
-        column = Gtk.TreeViewColumn("Port", renderer, text=1)
+        
+        self._port_renderer = Gtk.CellRendererText()
+        self._port_renderer.set_property("editable", True)
+        self._port_renderer.connect('edited', self._on_port_edited)
+        
+        column = Gtk.TreeViewColumn("Port", self._port_renderer, text=1)
+        column.set_cell_data_func(self._port_renderer, self._set_port_cell_data)
         self.replicaset.append_column(column)
+
+    def _on_host_edited(self, renderer, path, new_text):
+        model = self.replicaset.get_model()
+        itr = model.get_iter(path)
+        model.set_value(itr, 0, new_text)
+
+    def _on_port_edited(self, renderer, path, new_text):
+        model = self.replicaset.get_model()
+        itr = model.get_iter(path)
+        model.set_value(itr, 1, int(new_text))
+
+    def _set_port_cell_data(self, column, cell, model, itr, *data):
+
+        if self.conn_ssl_tls.get_active():
+            cell.set_property('text','(Default)')
+        else:
+            port = model.get_value(itr, 1)
+            cell.set_property('text',str(port))
 
     def show(self, conn_name=None, connection={}):
         self._populate_form(conn_name, connection)
@@ -49,6 +72,9 @@ class ConnectionEditorDialog(GladeObject):
     def _on_remove_replicaset(self, *args):
         model, itr = self.replicaset.get_selection().get_selected()
         model.remove(itr)
+
+    def _on_conn_ssl_tls_change(self, *args):
+        self._port_renderer.set_property('editable',not self.conn_ssl_tls.get_active())
 
     def _valid(self):
 
@@ -79,6 +105,7 @@ class ConnectionEditorDialog(GladeObject):
                                            and use_tunnel_password)
         self.tunnel_keyfile.set_sensitive(enable_tunnel
                                           and not use_tunnel_password)
+        self._port_renderer.set_property('editable',not self.conn_ssl_tls.get_active())
 
     def _valid_name(self, name):
         return len(name.strip()) > 1
@@ -180,6 +207,6 @@ class ConnectionEditorDialog(GladeObject):
             else:
                 self.use_tunnel_keyfile.set_active(True)
                 key_file = tunnel.get('keyfile')
-                if keyfile: self.tunnel_keyfile.set_filename(tunnel_keyfile)
+                if key_file: self.tunnel_keyfile.set_filename(key_file)
         else:
             self.use_ssh_tunnel.set_active(False)
