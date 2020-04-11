@@ -99,9 +99,12 @@ class QueryEditor(Gtk.VBox):
         self.remove_val_btn = GtkUtil.tool_button(Gtk.STOCK_REMOVE,
                                                   messages.BTN_REMOVE_ITEM,
                                                   self._on_remove_field)
-        self.copy_doc_btn = GtkUtil.tool_button(Gtk.STOCK_COPY,
-                                                messages.BTN_COPY,
-                                                self._on_copy_document)
+        self.copy_json_doc_btn = GtkUtil.tool_button(Gtk.STOCK_COPY,
+                                                messages.BTN_COPY_JSON,
+                                                self._on_copy_document_as_json)
+        self.copy_python_doc_btn = GtkUtil.tool_button(Gtk.STOCK_COPY,
+                                                messages.BTN_COPY_PYTHON,
+                                                self._on_copy_document_as_python)
         self.delete_doc_btn = GtkUtil.tool_button(Gtk.STOCK_DELETE,
                                                   messages.BTN_DELETE_DOCUMENT,
                                                   self._on_delete_document)
@@ -111,7 +114,7 @@ class QueryEditor(Gtk.VBox):
             Gtk.SeparatorToolItem(), self.edit_val_btn, self.add_val_btn,
             self.remove_val_btn,
             Gtk.SeparatorToolItem(), self.flush_updates_btn,
-            Gtk.SeparatorToolItem(), self.copy_doc_btn, self.delete_doc_btn
+            Gtk.SeparatorToolItem(), self.copy_python_doc_btn, self.copy_json_doc_btn, self.delete_doc_btn
         ]
 
     def _save_results(self, *args):
@@ -150,13 +153,15 @@ class QueryEditor(Gtk.VBox):
             self.edit_val_btn.set_sensitive(can_edit)
             self.add_val_btn.set_sensitive(can_add)
             self.remove_val_btn.set_sensitive(can_remove)
-            self.copy_doc_btn.set_sensitive(rowcount > 0)
+            self.copy_json_doc_btn.set_sensitive(rowcount > 0)
+            self.copy_python_doc_btn.set_sensitive(rowcount > 0)
             self.delete_doc_btn.set_sensitive(rowcount > 0)
         else:
             self.edit_val_btn.set_sensitive(False)
             self.add_val_btn.set_sensitive(False)
             self.remove_val_btn.set_sensitive(False)
-            self.copy_doc_btn.set_sensitive(False)
+            self.copy_json_doc_btn.set_sensitive(False)
+            self.copy_python_doc_btn.set_sensitive(False)
             self.delete_doc_btn.set_sensitive(False)
 
         self.flush_updates_btn.set_sensitive(len(self._updates) > 0)
@@ -288,14 +293,20 @@ class QueryEditor(Gtk.VBox):
         editor.connect('accept', _on_accept)
         editor.show(field, val)
 
-    def _on_copy_document(self, *args):
+    def _on_copy_document_as_json(self, *args):
+        self._copy_document(lambda doc:JsonUtil.dumps(doc, indent=4))
+
+    def _on_copy_document_as_python(self, *args):
+        self._on_copy_document(lambda doc: str(doc))
+
+    def _on_copy_document(self, format_func):
         model, itr = self.results.get_selection()
         doc_obj = model.get_value(itr, 1)
 
         display = Gdk.Display.get_default()
         clipboard = Gtk.Clipboard.get_default(display)
 
-        doc_str = JsonUtil.dumps(doc_obj, indent=4)
+        doc_str = format_func(doc_obj)
 
         clipboard.set_text(doc_str, -1)
 

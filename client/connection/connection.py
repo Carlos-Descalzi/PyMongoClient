@@ -140,8 +140,12 @@ class MongoConnection(GObject.GObject):
 
         scheme = 'mongodb+srv' if config.get('ssl') else 'mongodb'
 
-        return '%s://%s@%s/%s' % (scheme, auth, hostlist, config['db'])
+        url = '%s://%s@%s/%s' % (scheme, auth, hostlist, config['db'])
 
+        print(url)
+
+        return url
+        
     def _format_host(self, host_info, config):
         if config.get('ssl'):
             return '%(host)s' % host_info
