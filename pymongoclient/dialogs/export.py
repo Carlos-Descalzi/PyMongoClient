@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, GtkUtil, SubprocessHandler, ModelUtil
-import client.messages as messages
+import pymongoclient.messages as messages
 import json
 
 
@@ -54,7 +54,7 @@ class Exporter(SubprocessHandler):
 
 class ExportDialog(GladeObject):
     def __init__(self, connection, collection=None, resultset=None):
-        GladeObject.__init__(self, "client/ui/ExportDialog.glade")
+        GladeObject.__init__(self, "pymongoclient/ui/ExportDialog.glade")
         self._connection = connection
         self._resultset = resultset
         self._collection = collection

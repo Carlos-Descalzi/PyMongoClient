@@ -1,6 +1,6 @@
 import os
 import configparser
-
+from .utils.fileutil import locate_in_modules
 
 class _Messages:
     def __init__(self):
@@ -8,9 +8,12 @@ class _Messages:
         lang = locale.split('_')[0]
 
         for option in [locale, lang, 'en']:
-            fname = os.path.join('client', 'msgs', '%s.properties' % option)
-            if os.path.exists(fname):
-                self.__dict__.update(self._read_file(fname))
+            try:
+                fname = locate_in_modules(os.path.join('msgs', '%s.properties' % option))
+                if os.path.exists(fname):
+                    self.__dict__.update(self._read_file(fname))
+            except KeyError:
+                pass
 
     def _read_file(self, fname):
         results = {}

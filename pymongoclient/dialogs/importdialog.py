@@ -2,8 +2,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from client.utils import GladeObject, JsonUtil, GtkUtil
-from client.utils import SubprocessHandler
+from ..utils import GladeObject, JsonUtil, GtkUtil
+from ..utils import SubprocessHandler
 import tempfile
 
 
@@ -64,7 +64,7 @@ class Importer(SubprocessHandler):
 
 class ImportDialog(GladeObject):
     def __init__(self, connection, collection=None):
-        GladeObject.__init__(self, "client/ui/ImportDialog.glade")
+        GladeObject.__init__(self, "ui/ImportDialog.glade")
         self._connection = connection
         self._collection = collection
         self._running = False

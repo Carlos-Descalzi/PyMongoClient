@@ -1,5 +1,5 @@
 from collections import OrderedDict, defaultdict
-from client.utils import Templates
+from ..utils import Templates
 
 
 class OperationSet:

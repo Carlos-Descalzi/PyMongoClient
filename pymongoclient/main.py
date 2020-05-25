@@ -7,8 +7,11 @@ if version < 35:
 	sys.stderr.write('This program only works on Python >= 3.5\n')
 	sys.exit(1)
 
-from client import MainWindow
+from .mainwindow import MainWindow
 		
-if __name__ == '__main__':
+def main():
 	w = MainWindow()
 	w.run_main()
+
+if __name__ == '__main__':
+	main()

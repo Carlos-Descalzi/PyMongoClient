@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 import re
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from client.utils import GladeObject, ModelUtil
+from ..utils import GladeObject, ModelUtil
 
 HOST_PATTERN = '^[a-zA-Z0-9\\.\\-\\+_]+$'
 PORT_PATTERN = '^[1-9][0-9]+$'
@@ -17,7 +17,7 @@ class ConnectionEditorDialog(GladeObject):
     __gsignals__ = {'accept': (GObject.SIGNAL_RUN_FIRST, None, (str, object))}
 
     def __init__(self):
-        GladeObject.__init__(self, "client/ui/ConnEdit.glade")
+        GladeObject.__init__(self, "pymongoclient/ui/ConnEdit.glade")
         self.replicaset.set_model(Gtk.ListStore(str, int))
 
         renderer = Gtk.CellRendererText()

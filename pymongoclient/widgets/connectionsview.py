@@ -2,12 +2,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
-from client.connection import MongoConnection
-from client.utils import (GtkUtil, ModelUtil)
+from ..connection import MongoConnection
+from ..utils import (GtkUtil, ModelUtil)
 import json
 import os
 import os.path
-from client.messages import MESSAGES as messages
+from ..messages import MESSAGES as messages
 
 
 class ConnectionsView(Gtk.ScrolledWindow):

@@ -1,22 +1,22 @@
+import json
+from collections import OrderedDict
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from client.connection import MongoConnection
-from client.widgets.queryeditor import QueryEditor
-import json
-from client.dialogs import ConnectionEditorDialog
-from client.utils import GladeObject, Templates
-from client.dialogs import (ConfirmDialog, AboutDialog, ConnectionEditorDialog,
+from .connection import MongoConnection
+from .widgets.queryeditor import QueryEditor
+from .dialogs import ConnectionEditorDialog
+from .utils import GladeObject, Templates
+from .dialogs import (ConfirmDialog, AboutDialog, ConnectionEditorDialog,
                             MessageDialog, ImportDialog, ExportDialog)
-from client.widgets.connectionsview import ConnectionsView
-from collections import OrderedDict
-from client.messages import MESSAGES as messages
+from .widgets.connectionsview import ConnectionsView
+from .messages import MESSAGES as messages
 
 
 class MainWindow(GladeObject):
     def __init__(self):
-        GladeObject.__init__(self, "client/ui/MongoClient.glade")
+        GladeObject.__init__(self, "ui/MongoClient.glade")
 
         self.conn_view = ConnectionsView()
         self.conn_area.add(self.conn_view)

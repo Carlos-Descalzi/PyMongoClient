@@ -2,18 +2,18 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
-from client.connection import MongoConnection, CursorResultSet, ListResultSet
-from client.utils import (GtkUtil, ModelUtil, JsonUtil)
-from client.dialogs import (ExportDialog, FieldEditorDialog, ConfirmDialog)
-from client.widgets.results import ResultsView
-from client.crud import UpdatesHandler
+from ..connection import MongoConnection, CursorResultSet, ListResultSet
+from ..utils import (GtkUtil, ModelUtil, JsonUtil)
+from ..dialogs import (ExportDialog, FieldEditorDialog, ConfirmDialog)
+from ..widgets.results import ResultsView
+from ..crud import UpdatesHandler
 from collections import OrderedDict
 from bson.objectid import ObjectId
 import uuid
 import tempfile
 import runpy
 import pymongo.cursor
-from client.messages import MESSAGES as messages
+from ..messages import MESSAGES as messages
 
 QUERY_TEMPLATE = """
 from bson.objectid import *

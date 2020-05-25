@@ -7,7 +7,7 @@ from ..utils import GladeObject, GtkUtil
 
 class FieldEditorDialog(GladeObject):
     def __init__(self):
-        GladeObject.__init__(self, "client/ui/FieldEditDialog.glade")
+        GladeObject.__init__(self, "pymongoclient/ui/FieldEditDialog.glade")
 
     __gsignals__ = {'accept': (GObject.SIGNAL_RUN_FIRST, None, ())}
 
