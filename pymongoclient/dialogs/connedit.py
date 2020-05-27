@@ -17,7 +17,7 @@ class ConnectionEditorDialog(GladeObject):
     __gsignals__ = {'accept': (GObject.SIGNAL_RUN_FIRST, None, (str, object))}
 
     def __init__(self):
-        GladeObject.__init__(self, "pymongoclient/ui/ConnEdit.glade")
+        GladeObject.__init__(self, "ui/ConnEdit.glade")
         self.replicaset.set_model(Gtk.ListStore(str, int))
 
         renderer = Gtk.CellRendererText()

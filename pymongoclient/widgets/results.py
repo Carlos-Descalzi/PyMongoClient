@@ -22,6 +22,7 @@ class ResultsView(Gtk.VBox):
         Gtk.VBox.__init__(self, False, 0)
         self.model = None
         self.resultset = None
+        self._foreground_color = self._get_foreground()
         self.toolbar = Gtk.Toolbar()
 
         self.first_page_btn = GtkUtil.tool_button(Gtk.STOCK_MEDIA_PREVIOUS,
@@ -93,6 +94,14 @@ class ResultsView(Gtk.VBox):
         self.set_model(Gtk.TreeStore(str, object))
         self._update_actions()
 
+    def _get_foreground(self):
+        widget_path = Gtk.WidgetPath()
+        widget_path.append_type(Gtk.Label)
+        style_ctx = Gtk.StyleContext()
+        style_ctx.set_path(widget_path)
+        clr = style_ctx.get_color(Gtk.StateFlags.NORMAL)
+        return clr.to_string()
+
     def add_toolbar_items(self, items):
         for item in items:
             self.toolbar.insert(item, -1)
@@ -110,9 +119,10 @@ class ResultsView(Gtk.VBox):
         if self._has_updates(iter):
             cell.set_property('foreground', '#FF0000')
         else:
-            cell.set_property('foreground', '#000000')
+            cell.set_property('foreground', self._foreground_color)
 
         cell.set_property('text', str(value))
+
 
     def _render_type(self, col, cell, model, iter, data):
         value = model.get(iter, 1)[0]
@@ -129,7 +139,7 @@ class ResultsView(Gtk.VBox):
         if self._has_updates(iter):
             cell.set_property('foreground', '#FF0000')
         else:
-            cell.set_property('foreground', '#000000')
+            cell.set_property('foreground', self._foreground_color)
 
         cell.set_property('text', type_str)
 

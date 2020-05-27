@@ -7,7 +7,7 @@ from ..utils import GladeObject
 
 class MessageDialog(GladeObject):
     def __init__(self):
-        GladeObject.__init__(self, "pymongoclient/ui/MessageDialog.glade")
+        GladeObject.__init__(self, "ui/MessageDialog.glade")
 
     def show(self, title, message):
         self.message_dialog.set_title(title)

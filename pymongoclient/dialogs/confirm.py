@@ -10,7 +10,7 @@ class ConfirmDialog(GladeObject):
     __gsignals__ = {'accept': (GObject.SIGNAL_RUN_FIRST, None, ())}
 
     def __init__(self):
-        GladeObject.__init__(self, "pymongoclient/ui/ConfirmDialog.glade")
+        GladeObject.__init__(self, "ui/ConfirmDialog.glade")
 
     def show(self, title, message):
         self.confirm_dialog.set_title(title)

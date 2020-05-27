@@ -54,7 +54,7 @@ class Exporter(SubprocessHandler):
 
 class ExportDialog(GladeObject):
     def __init__(self, connection, collection=None, resultset=None):
-        GladeObject.__init__(self, "pymongoclient/ui/ExportDialog.glade")
+        GladeObject.__init__(self, "ui/ExportDialog.glade")
         self._connection = connection
         self._resultset = resultset
         self._collection = collection

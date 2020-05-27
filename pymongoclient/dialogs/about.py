@@ -7,7 +7,7 @@ from ..utils import GladeObject
 
 class AboutDialog(GladeObject):
     def __init__(self):
-        GladeObject.__init__(self, 'client/ui/AboutDialog.glade')
+        GladeObject.__init__(self, 'ui/AboutDialog.glade')
 
     def show(self):
         self.dialog.run()
