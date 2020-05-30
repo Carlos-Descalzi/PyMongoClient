@@ -1,9 +1,10 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
 from ..connection import MongoConnection
-from ..utils import (GtkUtil, ModelUtil)
+from ..utils import GtkUtil, ModelUtil
 import json
 import os
 import os.path
@@ -13,30 +14,30 @@ from ..messages import MESSAGES as messages
 class ConnectionsView(Gtk.ScrolledWindow):
 
     __gsignals__ = {
-        'connection-selected': (GObject.SIGNAL_RUN_FIRST, None, (object, str)),
-        'connection-error': (GObject.SIGNAL_RUN_FIRST, None, (object, object)),
-        'disconnected': (GObject.SIGNAL_RUN_FIRST, None, (object, ))
+        "connection-selected": (GObject.SIGNAL_RUN_FIRST, None, (object, str)),
+        "connection-error": (GObject.SIGNAL_RUN_FIRST, None, (object, object)),
+        "disconnected": (GObject.SIGNAL_RUN_FIRST, None, (object,)),
     }
 
     def __init__(self):
         Gtk.ScrolledWindow.__init__(self)
         self.view = Gtk.TreeView()
         self.add(self.view)
-        self.view.connect('row-activated', self._on_row_selected)
+        self.view.connect("row-activated", self._on_row_selected)
         renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn('Connections', renderer)
+        column = Gtk.TreeViewColumn("Connections", renderer)
         column.set_cell_data_func(renderer, self._render_cell)
         self.view.append_column(column)
         self._init_connections()
         self._menu_actions = {}
         self.menu = Gtk.Menu()
 
-        self._add_menu_item(messages.MN_ITEM_CONNECT, 'connection',
-                            self._on_connect)
-        self._add_menu_item(messages.MN_ITEM_DISCONNECT, 'connection',
-                            self._on_disconnect)
+        self._add_menu_item(messages.MN_ITEM_CONNECT, "connection", self._on_connect)
+        self._add_menu_item(
+            messages.MN_ITEM_DISCONNECT, "connection", self._on_disconnect
+        )
 
-        self.view.connect('button_press_event', self._on_button_press_event)
+        self.view.connect("button_press_event", self._on_button_press_event)
 
     def get_selected_connection(self):
         selection = self.view.get_selection()
@@ -75,11 +76,13 @@ class ConnectionsView(Gtk.ScrolledWindow):
         self._save_connections(connections)
 
         connected = conn_obj.is_connected()
-        if connected: conn_obj.disconnect_from_server()
+        if connected:
+            conn_obj.disconnect_from_server()
 
         conn_obj.config = data
 
-        if connected: conn_obj.connect_to_server()
+        if connected:
+            conn_obj.connect_to_server()
 
     def remove_connection(self, conn_obj):
         model, itr = self._get_conn_iter(conn_obj)
@@ -87,7 +90,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
         if conn_obj.is_connected():
             conn_obj.disconnect_from_server()
-            self.emit('disconnected', conn_obj)
+            self.emit("disconnected", conn_obj)
 
         connections = self._load_connections()
         del connections[conn_obj.name]
@@ -98,18 +101,18 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
         if value:
             if isinstance(value, MongoConnection):
-                status = 'Not connected'
+                status = "Not connected"
                 if value.is_connected():
-                    status = 'Connected'
+                    status = "Connected"
                 elif value.is_connecting():
-                    status = 'Connecting'
+                    status = "Connecting"
 
-                conn_str = '%s (%s)' % (value.name, status)
-                cell.set_property('text', conn_str)
+                conn_str = "%s (%s)" % (value.name, status)
+                cell.set_property("text", conn_str)
             else:
-                cell.set_property('text', value)
+                cell.set_property("text", value)
         else:
-            cell.set_property('text', '')
+            cell.set_property("text", "")
 
     def _load_connections(self):
 
@@ -117,7 +120,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
         if os.path.exists(connections_file):
             try:
-                with open(connections_file, 'r') as f:
+                with open(connections_file, "r") as f:
                     return json.load(f)
             except:
                 pass
@@ -127,11 +130,11 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
         connections_file = self._get_connections_file()
 
-        with open(connections_file, 'w') as f:
+        with open(connections_file, "w") as f:
             json.dump(connections, f, indent=4)
 
     def _get_connections_file(self):
-        folder = os.path.join(os.environ['HOME'], '.mongoclient')
+        folder = os.path.join(os.environ["HOME"], ".mongoclient")
 
         if not os.path.isdir(folder):
             try:
@@ -139,7 +142,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
             except:
                 pass
 
-        return os.path.join(folder, 'connections.json')
+        return os.path.join(folder, "connections.json")
 
     def _init_connections(self):
         connections = self._load_connections()
@@ -152,8 +155,8 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
     def _add_new_conn_obj(self, store, name, data):
         conn = MongoConnection(name, data)
-        conn.connect('connected', self._conn_connected)
-        conn.connect('connect_error', self._conn_error)
+        conn.connect("connected", self._conn_connected)
+        conn.connect("connect_error", self._conn_error)
         store.append(None, [conn])
 
     def _on_row_selected(self, view, path, column):
@@ -167,11 +170,11 @@ class ConnectionsView(Gtk.ScrolledWindow):
             if not value.is_connected():
                 value.connect_to_server()
             else:
-                self.emit('connection-selected', value, None)
+                self.emit("connection-selected", value, None)
         else:
             itr = model.get_iter(path)
             conn_obj = model.get_value(model.iter_parent(itr), 0)
-            self.emit('connection-selected', conn_obj, value)
+            self.emit("connection-selected", conn_obj, value)
 
     def _conn_connected(self, conn):
         def _load_collections():
@@ -195,7 +198,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
     def _conn_error(self, conn, error):
         def _notify():
-            self.emit('connection-error', conn, error)
+            self.emit("connection-error", conn, error)
 
         GLib.idle_add(_notify)
 
@@ -213,8 +216,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
         if event.type == Gdk.EventType.BUTTON_PRESS:
             if event.button == 3:
                 self._update_menu_actions()
-                self.menu.popup(None, None, None, None, event.button,
-                                event.time)
+                self.menu.popup(None, None, None, None, event.button, event.time)
 
     def _update_menu_actions(self):
         path = self.get_selected_path()
@@ -224,16 +226,19 @@ class ConnectionsView(Gtk.ScrolledWindow):
             for label, item in list(self._menu_actions.items()):
                 target, menu_item = item
 
-                if label == 'Connect':
+                if label == "Connect":
                     menu_item.set_sensitive(
-                        len(path) == 1 and not path[0].is_connected())
+                        len(path) == 1 and not path[0].is_connected()
+                    )
                 else:
-                    if target == 'connection':
+                    if target == "connection":
                         menu_item.set_sensitive(
-                            len(path) == 1 and path[0].is_connected())
-                    elif target == 'collection':
+                            len(path) == 1 and path[0].is_connected()
+                        )
+                    elif target == "collection":
                         menu_item.set_sensitive(
-                            len(path) == 2 and path[0].is_connected())
+                            len(path) == 2 and path[0].is_connected()
+                        )
                     else:
                         menu_item.set_sensitive(True)
         else:
@@ -248,7 +253,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
     def _on_disconnect(self, *args):
         conn = self.get_selected_connection()
         conn.disconnect_from_server()
-        self.emit('disconnected', conn)
+        self.emit("disconnected", conn)
 
         model, itr = self._get_conn_iter(conn)
 

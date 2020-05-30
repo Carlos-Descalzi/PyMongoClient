@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import GObject
 import pymongo
 import runpy
@@ -21,7 +22,7 @@ class DataDumper:
 
 
 class ResultSet(GObject.GObject):
-    __gsignals__ = {'ready': (GObject.SIGNAL_RUN_FIRST, None, ())}
+    __gsignals__ = {"ready": (GObject.SIGNAL_RUN_FIRST, None, ())}
 
     def __init__(self, data, collection, last_op):
         GObject.GObject.__init__(self)
@@ -68,13 +69,13 @@ class ResultSet(GObject.GObject):
         def _do_run():
             self._do_update_page_data()
             self._ready = True
-            self.emit('ready')
+            self.emit("ready")
 
         self.thread = threading.Thread(target=_do_run)
         self.thread.start()
 
     def _do_update_page_data(self):
-        raise Exception('Unimplemented')
+        raise Exception("Unimplemented")
 
     def create_export_job(self, dumper):
         return ResultSetExporter(self, dumper)
@@ -93,7 +94,8 @@ class CursorResultSet(ResultSet):
         self.totalsize = data.count()
         self.page = 0
         self.pages = self.totalsize / 20
-        if self.totalsize % 20 > 0: self.pages += 1
+        if self.totalsize % 20 > 0:
+            self.pages += 1
         self.pagedata = []
         self._update_page_data()
 
@@ -102,7 +104,7 @@ class CursorResultSet(ResultSet):
 
     def _do_update_page_data(self):
         self.data.rewind()
-        self.pagedata = list(self.data[self.page * 20:(self.page + 1) * 20])
+        self.pagedata = list(self.data[self.page * 20 : (self.page + 1) * 20])
 
     def generator(self):
         self.data.rewind()
@@ -117,7 +119,8 @@ class ListResultSet(ResultSet):
         self.data = data
         self.page = 0
         self.pages = len(data) / 20
-        if len(data) % 20 > 0: self.pages += 1
+        if len(data) % 20 > 0:
+            self.pages += 1
         self.pagedata = []
         self._update_page_data()
 
@@ -125,7 +128,7 @@ class ListResultSet(ResultSet):
         return len(self.data)
 
     def _do_update_page_data(self):
-        self.pagedata = self.data[self.page * 20:(self.page + 1) * 20]
+        self.pagedata = self.data[self.page * 20 : (self.page + 1) * 20]
 
     def generator(self):
         for doc in self.data:
@@ -134,9 +137,9 @@ class ListResultSet(ResultSet):
 
 class ResultSetExporter(GObject.GObject):
     __gsignals__ = {
-        'started': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'progress': (GObject.SIGNAL_RUN_FIRST, None, (int, int)),
-        'finished': (GObject.SIGNAL_RUN_FIRST, None, ())
+        "started": (GObject.SIGNAL_RUN_FIRST, None, ()),
+        "progress": (GObject.SIGNAL_RUN_FIRST, None, (int, int)),
+        "finished": (GObject.SIGNAL_RUN_FIRST, None, ()),
     }
 
     def __init__(self, resultset, dumper):
@@ -151,15 +154,15 @@ class ResultSetExporter(GObject.GObject):
 
     def run(self):
         self._dumper.start()
-        self.emit('started')
+        self.emit("started")
 
         n = 0
         total = len(self._resultset)
 
         for document in self._resultset.generator():
             self._dumper.dump(document)
-            self.emit('progress', n, total)
+            self.emit("progress", n, total)
             n += 1
 
         self._dumper.finish()
-        self.emit('finished')
+        self.emit("finished")

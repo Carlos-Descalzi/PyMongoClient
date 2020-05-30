@@ -18,14 +18,13 @@ class SubprocessHandler(metaclass=ABCMeta):
         self._listener.finish()
 
     def start(self):
-        self._thread = Thread(target=self._run,
-                              args=(self._build_command_lines(), ))
+        self._thread = Thread(target=self._run, args=(self._build_command_lines(),))
         self._thread.start()
 
     def _run(self, commands):
 
         for command in commands:
-            self.log('Running command: %s' % ' '.join(command))
+            self.log("Running command: %s" % " ".join(command))
             try:
                 self._pipe = Popen(command, stdout=PIPE, stderr=PIPE)
 
@@ -39,17 +38,17 @@ class SubprocessHandler(metaclass=ABCMeta):
 
                     stdout, stderr = self._pipe.stdout, self._pipe.stderr
 
-                    ready, _, _ = select.select((stdout, stderr), (), (), .1)
+                    ready, _, _ = select.select((stdout, stderr), (), (), 0.1)
 
                     for fobj in ready:
                         self.log(fobj.readline().strip())
 
-                    time.sleep(.1)
+                    time.sleep(0.1)
 
-                self.log('Exited with return code %s' % return_code)
+                self.log("Exited with return code %s" % return_code)
 
             except Exception as e:
-                self.log('Error exporting: %s' % e)
+                self.log("Error exporting: %s" % e)
 
         self.finish()
 

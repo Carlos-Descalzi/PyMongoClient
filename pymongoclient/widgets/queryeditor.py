@@ -1,10 +1,11 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
 from ..connection import MongoConnection, CursorResultSet, ListResultSet
-from ..utils import (GtkUtil, ModelUtil, JsonUtil)
-from ..dialogs import (ExportDialog, FieldEditorDialog, ConfirmDialog)
+from ..utils import GtkUtil, ModelUtil, JsonUtil
+from ..dialogs import ExportDialog, FieldEditorDialog, ConfirmDialog
 from ..widgets.results import ResultsView
 from ..crud import UpdatesHandler
 from collections import OrderedDict
@@ -31,9 +32,9 @@ class QueryEditor(Gtk.VBox):
         self._updates = UpdatesHandler()
 
         toolbar = Gtk.Toolbar()
-        self.execute_btn = GtkUtil.tool_button(Gtk.STOCK_EXECUTE,
-                                               messages.BTN_EXECUTE,
-                                               self._on_execute)
+        self.execute_btn = GtkUtil.tool_button(
+            Gtk.STOCK_EXECUTE, messages.BTN_EXECUTE, self._on_execute
+        )
         toolbar.insert(self.execute_btn, -1)
 
         self.pack_start(toolbar, False, False, 0)
@@ -45,12 +46,12 @@ class QueryEditor(Gtk.VBox):
 
         lang_manager = GtkSource.LanguageManager.get_default()
 
-        lang = lang_manager.get_language('python')
+        lang = lang_manager.get_language("python")
 
         self.buffer = GtkSource.Buffer.new_with_language(lang)
         self.code_view.set_buffer(self.buffer)
         self.code_view.set_show_line_numbers(True)
-        font_desc = Pango.FontDescription('monospace 10')
+        font_desc = Pango.FontDescription("monospace 10")
         self.code_view.modify_font(font_desc)
         self.paned.set_position(150)
         self.results = ResultsView()
@@ -67,54 +68,58 @@ class QueryEditor(Gtk.VBox):
         self.results.add_toolbar_items(self.build_results_actions())
 
         self.results_tab = Gtk.Notebook()
-        self.results_tab.append_page(self.results,
-                                     Gtk.Label(messages.TAB_RESULTS))
-        self.results_tab.append_page(log_scroll,
-                                     Gtk.Label(messages.TAB_OUTPUT))
+        self.results_tab.append_page(self.results, Gtk.Label(messages.TAB_RESULTS))
+        self.results_tab.append_page(log_scroll, Gtk.Label(messages.TAB_OUTPUT))
         self.paned.add2(self.results_tab)
 
-        self.results.connect('update-request', self._on_update_field)
-        self.results.connect('selection-changed', self._on_selection_changed)
-        self.results.connect('notify-status', self._on_results_status)
+        self.results.connect("update-request", self._on_update_field)
+        self.results.connect("selection-changed", self._on_selection_changed)
+        self.results.connect("notify-status", self._on_results_status)
         self._update_results_actions()
 
         self.status_bar = Gtk.Statusbar()
         self.pack_start(self.status_bar, False, False, 0)
-        self.status_ctx = self.status_bar.get_context_id('')
+        self.status_ctx = self.status_bar.get_context_id("")
 
     ####
     def build_results_actions(self):
-        self.save_btn = GtkUtil.tool_button(Gtk.STOCK_SAVE,
-                                            messages.BTN_EXPORT_DATA,
-                                            self._save_results)
+        self.save_btn = GtkUtil.tool_button(
+            Gtk.STOCK_SAVE, messages.BTN_EXPORT_DATA, self._save_results
+        )
         self.flush_updates_btn = GtkUtil.tool_button(
-            Gtk.STOCK_APPLY, messages.BTN_APPLY_UPDATES,
-            self._on_flush_updates)
-        self.edit_val_btn = GtkUtil.tool_button(Gtk.STOCK_EDIT,
-                                                messages.BTN_EDIT_VALUE,
-                                                self._on_edit_val)
-        self.add_val_btn = GtkUtil.tool_button(Gtk.STOCK_ADD,
-                                               messages.BTN_ADD_ITEM,
-                                               self._on_add_field)
-        self.remove_val_btn = GtkUtil.tool_button(Gtk.STOCK_REMOVE,
-                                                  messages.BTN_REMOVE_ITEM,
-                                                  self._on_remove_field)
-        self.copy_json_doc_btn = GtkUtil.tool_button(Gtk.STOCK_COPY,
-                                                messages.BTN_COPY_JSON,
-                                                self._on_copy_document_as_json)
-        self.copy_python_doc_btn = GtkUtil.tool_button(Gtk.STOCK_COPY,
-                                                messages.BTN_COPY_PYTHON,
-                                                self._on_copy_document_as_python)
-        self.delete_doc_btn = GtkUtil.tool_button(Gtk.STOCK_DELETE,
-                                                  messages.BTN_DELETE_DOCUMENT,
-                                                  self._on_delete_document)
+            Gtk.STOCK_APPLY, messages.BTN_APPLY_UPDATES, self._on_flush_updates
+        )
+        self.edit_val_btn = GtkUtil.tool_button(
+            Gtk.STOCK_EDIT, messages.BTN_EDIT_VALUE, self._on_edit_val
+        )
+        self.add_val_btn = GtkUtil.tool_button(
+            Gtk.STOCK_ADD, messages.BTN_ADD_ITEM, self._on_add_field
+        )
+        self.remove_val_btn = GtkUtil.tool_button(
+            Gtk.STOCK_REMOVE, messages.BTN_REMOVE_ITEM, self._on_remove_field
+        )
+        self.copy_json_doc_btn = GtkUtil.tool_button(
+            Gtk.STOCK_COPY, messages.BTN_COPY_JSON, self._on_copy_document_as_json
+        )
+        self.copy_python_doc_btn = GtkUtil.tool_button(
+            Gtk.STOCK_COPY, messages.BTN_COPY_PYTHON, self._on_copy_document_as_python
+        )
+        self.delete_doc_btn = GtkUtil.tool_button(
+            Gtk.STOCK_DELETE, messages.BTN_DELETE_DOCUMENT, self._on_delete_document
+        )
 
         return [
             self.save_btn,
-            Gtk.SeparatorToolItem(), self.edit_val_btn, self.add_val_btn,
+            Gtk.SeparatorToolItem(),
+            self.edit_val_btn,
+            self.add_val_btn,
             self.remove_val_btn,
-            Gtk.SeparatorToolItem(), self.flush_updates_btn,
-            Gtk.SeparatorToolItem(), self.copy_python_doc_btn, self.copy_json_doc_btn, self.delete_doc_btn
+            Gtk.SeparatorToolItem(),
+            self.flush_updates_btn,
+            Gtk.SeparatorToolItem(),
+            self.copy_python_doc_btn,
+            self.copy_json_doc_btn,
+            self.delete_doc_btn,
         ]
 
     def _save_results(self, *args):
@@ -205,30 +210,30 @@ class QueryEditor(Gtk.VBox):
 
         def statement(db):
 
-            script_globals = {'db': db, 'log': self._log, 'resultset': None}
+            script_globals = {"db": db, "log": self._log, "resultset": None}
             try:
                 print(query)
 
-                compiled = compile(query, 'script.py', 'exec')
+                compiled = compile(query, "script.py", "exec")
 
                 eval(compiled, script_globals)
 
-                resultset = script_globals['resultset']
+                resultset = script_globals["resultset"]
 
                 if isinstance(resultset, pymongo.cursor.Cursor):
                     resultset = CursorResultSet(resultset, None)
                 else:
                     if not isinstance(resultset, list):
                         resultset = [resultset]
-                    resultset = ListResultSet(resultset, '', None)
+                    resultset = ListResultSet(resultset, "", None)
 
                 GLib.idle_add(self.feed_output, resultset)
             except SyntaxError as e:
-                self._log('%s, at line %s' % (e.msg, e.lineno))
+                self._log("%s, at line %s" % (e.msg, e.lineno))
             except Exception as e:
                 self._log(str(e))
 
-        self._set_status('Executing query ...')
+        self._set_status("Executing query ...")
         self.conn_obj.execute_statement(statement)
 
     def _log(self, message):
@@ -259,7 +264,7 @@ class QueryEditor(Gtk.VBox):
                 self.results.add_array_field(itr, field_value)
             self._update_results_actions()
 
-        editor.connect('accept', _on_accept)
+        editor.connect("accept", _on_accept)
         editor.show(disable_name=isinstance(value, list))
 
     def _on_remove_field(self, src):
@@ -290,11 +295,11 @@ class QueryEditor(Gtk.VBox):
         def _on_accept():
             pass
 
-        editor.connect('accept', _on_accept)
+        editor.connect("accept", _on_accept)
         editor.show(field, val)
 
     def _on_copy_document_as_json(self, *args):
-        self._copy_document(lambda doc:JsonUtil.dumps(doc, indent=4))
+        self._copy_document(lambda doc: JsonUtil.dumps(doc, indent=4))
 
     def _on_copy_document_as_python(self, *args):
         self._on_copy_document(lambda doc: str(doc))
@@ -316,13 +321,12 @@ class QueryEditor(Gtk.VBox):
         path = ModelUtil.get_json_path(model, itr)
         doc_id = path[0]
 
-        response = ConfirmDialog().show(messages.CONFIRM,
-                                        messages.CONFIRM_DELETE)
+        response = ConfirmDialog().show(messages.CONFIRM, messages.CONFIRM_DELETE)
 
         if response == Gtk.ResponseType.OK:
 
             def statement(db):
-                db[collection].delete_one({'_id': doc_id})
+                db[collection].delete_one({"_id": doc_id})
 
             self._do_execute_statement(statement)
             self.results.remove(ModelUtil.root(model, itr))
@@ -333,7 +337,7 @@ class QueryEditor(Gtk.VBox):
         def statement(db):
             for item in sentences:
                 collection, doc_id, updates = item
-                db[collection].find_and_modify({'_id': doc_id}, updates)
+                db[collection].find_and_modify({"_id": doc_id}, updates)
 
         self._do_execute_statement(statement)
 

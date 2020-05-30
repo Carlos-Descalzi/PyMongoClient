@@ -1,13 +1,14 @@
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 
 def text_buffer_append(text_buffer, text):
     if isinstance(text, bytes):
-        text = text.decode('utf-8')
+        text = text.decode("utf-8")
     it = text_buffer.get_end_iter()
-    text_buffer.insert(it, text + '\n')
+    text_buffer.insert(it, text + "\n")
 
 
 def text_view_append(view, text):
@@ -32,13 +33,13 @@ def get_text(textview):
 def tool_button(stock_id, text, handler):
     btn = Gtk.ToolButton.new_from_stock(stock_id)
     btn.set_tooltip_text(text)
-    btn.connect('clicked', handler)
+    btn.connect("clicked", handler)
     return btn
 
 
 def menu_item(label, handler):
     item = Gtk.MenuItem.new_with_label(label)
-    item.connect('activate', handler)
+    item.connect("activate", handler)
     item.show()
     return item
 

@@ -1,4 +1,4 @@
-__all__ = ['JsonUtil']
+__all__ = ["JsonUtil"]
 
 import json
 from bson.int64 import Int64
@@ -9,8 +9,7 @@ from datetime import datetime
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
-            return str(
-                int((o - datetime.utcfromtimestamp(0)).total_seconds() * 1000))
+            return str(int((o - datetime.utcfromtimestamp(0)).total_seconds() * 1000))
         elif isinstance(o, ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
@@ -31,5 +30,5 @@ class JsonUtil:
 
     @staticmethod
     def dumpf(obj, fname, **kwargs):
-        with open(fname, 'w') as f:
+        with open(fname, "w") as f:
             JsonUtil.dump(obj, f, **kwargs)

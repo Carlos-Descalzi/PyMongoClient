@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, JsonUtil, GtkUtil
 from ..utils import SubprocessHandler
@@ -15,9 +16,9 @@ class Importer(SubprocessHandler):
         self._filename = filename
         self.drop = False
         self.array = False
-        self.file_type = 'json'
+        self.file_type = "json"
         self.header = False
-        self.mode = 'insert'
+        self.mode = "insert"
         self.upsert_fields = []
         self.stop_on_error = False
         self.gzip = False
@@ -28,34 +29,34 @@ class Importer(SubprocessHandler):
 
         if self.gzip:
 
-            tf = tempfile.NamedTemporaryFile(suffix='.gz', delete=False)
+            tf = tempfile.NamedTemporaryFile(suffix=".gz", delete=False)
 
-            commands += [['cp', self._filename, tf.name], ['gunzip', tf.name]]
-            self._filename = tf.name.replace('.gz', '')
+            commands += [["cp", self._filename, tf.name], ["gunzip", tf.name]]
+            self._filename = tf.name.replace(".gz", "")
 
         command = [
-            'mongoimport',
-            '--uri=%s' % self._connection.build_uri(),
-            '--file=%s' % self._filename,
-            '-c=%s' % self._collection
+            "mongoimport",
+            "--uri=%s" % self._connection.build_uri(),
+            "--file=%s" % self._filename,
+            "-c=%s" % self._collection,
         ]
 
         if self.drop:
-            command += ['--drop']
+            command += ["--drop"]
         if self.array:
-            command += ['--jsonArray']
+            command += ["--jsonArray"]
 
-        command += ['--type=%s' % self.file_type]
+        command += ["--type=%s" % self.file_type]
 
-        command += ['--mode=%s' % self.mode]
-        if self.mode == 'upsert' and self.upsert_fields:
-            command += ['--upsertFields=%s' % ','.join(self.upsert_fields)]
+        command += ["--mode=%s" % self.mode]
+        if self.mode == "upsert" and self.upsert_fields:
+            command += ["--upsertFields=%s" % ",".join(self.upsert_fields)]
 
         if self.header:
-            command += ['--headerline']
+            command += ["--headerline"]
 
         if self.stop_on_error:
-            command += ['--stopOnError']
+            command += ["--stopOnError"]
 
         commands.append(command)
 
@@ -69,7 +70,8 @@ class ImportDialog(GladeObject):
         self._collection = collection
         self._running = False
         self.file_name.add_filter(
-            GtkUtil.file_filter(['*.json', '*.csv', '*.json.gz', '*.csv.gz']))
+            GtkUtil.file_filter(["*.json", "*.csv", "*.json.gz", "*.csv.gz"])
+        )
 
     def show(self):
         for c in sorted(self._connection.get_db().collection_names()):
@@ -83,21 +85,22 @@ class ImportDialog(GladeObject):
         self.dialog.show()
 
     def _valid_data(self):
-        return \
-         self.file_name.get_filename() != '' \
-         and self.collection.get_active_text() not in [None,'']
+        return self.file_name.get_filename() != "" and self.collection.get_active_text() not in [
+            None,
+            "",
+        ]
 
     def _on_file_changed(self, *args):
 
         filename = self.file_name.get_filename()
 
         if filename:
-            if '.csv' in filename.lower():
+            if ".csv" in filename.lower():
                 self.file_type.set_current_page(1)
             else:
                 self.file_type.set_current_page(0)
 
-            self.gzip.set_active('.gz' in filename.lower())
+            self.gzip.set_active(".gz" in filename.lower())
 
         self._update_actions()
 
@@ -111,7 +114,7 @@ class ImportDialog(GladeObject):
         else:
             valid = self._valid_data()
             self.coll_entry.set_sensitive(True)
-            self.coll_entry.set_property('editable', True)
+            self.coll_entry.set_property("editable", True)
             self.file_type.set_sensitive(True)
             self.collection.set_hexpand(True)
             self.fields.set_sensitive(not self.headers.get_active())
@@ -134,10 +137,10 @@ class ImportDialog(GladeObject):
         self._importer = Importer(self, self._connection, collection, filename)
 
         if self.file_type.get_current_page() == 0:
-            self._importer.file_type = 'json'
+            self._importer.file_type = "json"
             self._importer.array = self.records_json_array.get_active()
         else:
-            self._importer.file_type = 'csv'
+            self._importer.file_type = "csv"
             self._importer.header = self.headers.get_active()
 
         self._importer.drop = self.drop_collection.get_active()
@@ -145,11 +148,11 @@ class ImportDialog(GladeObject):
         self._importer.gzip = self.gzip.get_active()
 
         if self.mode_insert.get_active():
-            self._importer.mode = 'insert'
+            self._importer.mode = "insert"
         elif self.mode_upsert.get_active():
-            self._importer.mode = 'upsert'
+            self._importer.mode = "upsert"
         else:
-            self._importer.mode = 'merge'
+            self._importer.mode = "merge"
 
         self.main_tabs.set_current_page(1)
 

@@ -33,7 +33,7 @@ class Path:
         return Templates.make_path(self.path)
 
     def __hash__(self):
-        return hash('.'.join(map(str, self.path)))
+        return hash(".".join(map(str, self.path)))
 
 
 class UpdatesHandler:
@@ -79,22 +79,22 @@ class UpdatesHandler:
                 sets = operations.build_sets()
 
                 if len(sets) > 0:
-                    sentences.append((collection, doc_id, {'$set': sets}))
+                    sentences.append((collection, doc_id, {"$set": sets}))
 
                 pushes = operations.build_pushes()
 
                 if len(pushes) > 0:
-                    sentences.append((collection, doc_id, {'$push': pushes}))
+                    sentences.append((collection, doc_id, {"$push": pushes}))
 
                 unsets = operations.build_unsets()
 
                 if len(unsets) > 0:
-                    sentences.append((collection, doc_id, {'$unset': unsets}))
+                    sentences.append((collection, doc_id, {"$unset": unsets}))
 
                 pulls = operations.build_pulls()
 
                 if len(pulls) > 0:
-                    sentences.append((collection, doc_id, {'$pull': pulls}))
+                    sentences.append((collection, doc_id, {"$pull": pulls}))
 
         return sentences
 

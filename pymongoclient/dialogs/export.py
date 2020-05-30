@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, GtkUtil, SubprocessHandler, ModelUtil
 import pymongoclient.messages as messages
@@ -13,7 +14,7 @@ class Exporter(SubprocessHandler):
         self._connection = connection
         self._collection = collection
         self._filename = filename
-        self.file_format = 'json'
+        self.file_format = "json"
         self.header_line = False
         self.pretty_print = False
         self.array = False
@@ -26,28 +27,28 @@ class Exporter(SubprocessHandler):
         query_str = json.dumps(self.query or {}).replace('"', '\\"')
 
         command = [
-            'mongoexport',
-            '--uri=%s' % self._connection.build_uri(),
-            '-c=%s' % self._collection,
+            "mongoexport",
+            "--uri=%s" % self._connection.build_uri(),
+            "-c=%s" % self._collection,
             '-q="%s"' % query_str,
-            '--type=%s' % self.file_format,
-            '-o=%s' % self._filename
+            "--type=%s" % self.file_format,
+            "-o=%s" % self._filename,
         ]
 
-        if self.file_format == 'json':
+        if self.file_format == "json":
             if self.pretty_print:
-                command += ['--pretty']
+                command += ["--pretty"]
             if self.array:
-                command += ['--jsonArray']
+                command += ["--jsonArray"]
         else:
             if not self.header_line:
-                command += ['--noHeaderLine']
-            command += ['--fields=%s' % ','.join(self.fields)]
+                command += ["--noHeaderLine"]
+            command += ["--fields=%s" % ",".join(self.fields)]
 
         commands = [command]
 
         if self.gzip:
-            commands += [['gzip', self._filename]]
+            commands += [["gzip", self._filename]]
 
         return commands
 
@@ -65,8 +66,8 @@ class ExportDialog(GladeObject):
 
     def _extract_fields(self):
         renderer = Gtk.CellRendererToggle()
-        renderer.set_property('activatable', True)
-        renderer.connect('toggled', self._on_field_toggled)
+        renderer.set_property("activatable", True)
+        renderer.connect("toggled", self._on_field_toggled)
         column = Gtk.TreeViewColumn("Select", renderer)
         column.add_attribute(renderer, "active", 0)
         column.set_max_width(50)
@@ -86,13 +87,10 @@ class ExportDialog(GladeObject):
             row = data[0]
 
             fields = sorted(
-                list(
-                    set([
-                        '.'.join(x) for x in self._do_extract_fields([], row)
-                    ])))
+                list(set([".".join(x) for x in self._do_extract_fields([], row)]))
+            )
 
-            fields = [(True,'Select all')]+\
-             [(False,x) for x in fields]
+            fields = [(True, "Select all")] + [(False, x) for x in fields]
             for field in fields:
                 model.append(field)
 
@@ -122,11 +120,18 @@ class ExportDialog(GladeObject):
 
     def _on_select_file(self, *args):
         dialog = Gtk.FileChooserDialog(
-            messages.SAVE_FILE_DIALOG, self.dialog, Gtk.FileChooserAction.SAVE,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE,
-             Gtk.ResponseType.OK))
+            messages.SAVE_FILE_DIALOG,
+            self.dialog,
+            Gtk.FileChooserAction.SAVE,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE,
+                Gtk.ResponseType.OK,
+            ),
+        )
 
-        dialog.add_filter(GtkUtil.file_filter(['*.json', '*.csv']))
+        dialog.add_filter(GtkUtil.file_filter(["*.json", "*.csv"]))
 
         if dialog.run() == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
@@ -136,7 +141,7 @@ class ExportDialog(GladeObject):
 
     def _update_actions(self, *args):
 
-        has_file = self.file_name.get_text().strip() != ''
+        has_file = self.file_name.get_text().strip() != ""
 
         self.file_name.set_sensitive(not self._running)
 
@@ -167,7 +172,8 @@ class ExportDialog(GladeObject):
 
         for i, itr in enumerate(ModelUtil.iterator(model)):
             if i == 0:
-                if model.get_value(itr, 0): all_fields = True
+                if model.get_value(itr, 0):
+                    all_fields = True
             else:
                 if all_fields or model.get_value(itr, 0):
                     fields.append(model.get_value(itr, 1))
@@ -180,13 +186,15 @@ class ExportDialog(GladeObject):
         filename = self.file_name.get_text()
 
         self._exporter = Exporter(
-            self, self._connection, self._collection
-            or self._resultset.resultset.collection, filename)
+            self,
+            self._connection,
+            self._collection or self._resultset.resultset.collection,
+            filename,
+        )
 
-        types = ['json', 'csv']
+        types = ["json", "csv"]
 
-        self._exporter.file_format = types[
-            self.export_type_tab.get_current_page()]
+        self._exporter.file_format = types[self.export_type_tab.get_current_page()]
         self._exporter.header_line = self.header_line.get_active()
         self._exporter.fields = self._get_fields()
         self._exporter.pretty_print = self.pretty_print.get_active()

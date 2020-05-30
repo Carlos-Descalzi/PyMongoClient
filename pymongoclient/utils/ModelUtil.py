@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 import json
 from datetime import datetime
@@ -32,10 +33,10 @@ class ModelUtil:
         model = Gtk.TreeStore(object, object, bool)
         for obj in cursor:
             if isinstance(obj, dict):
-                if '_id' in obj:
-                    key = obj['_id']
+                if "_id" in obj:
+                    key = obj["_id"]
                 else:
-                    key = 'Document'
+                    key = "Document"
 
                 parent = model.append(None, (key, obj, False))
                 ModelUtil.do_append_obj(model, obj, parent)
@@ -67,12 +68,11 @@ class ModelUtil:
             elif ModelUtil._is_primitive(val):
                 model.append(parent, (key, val, False))
             else:
-                print('Unknown value', type(val), val)
+                print("Unknown value", type(val), val)
 
     @staticmethod
     def _is_primitive(val):
-        return val is None or isinstance(val,
-                                         (str, int, bool, datetime, ObjectId))
+        return val is None or isinstance(val, (str, int, bool, datetime, ObjectId))
 
     @staticmethod
     def get_json_path(model, itr):

@@ -1,8 +1,9 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
-from ..utils import (GtkUtil, ModelUtil)
+from ..utils import GtkUtil, ModelUtil
 from .connectionsview import ConnectionsView
 from .JsonFieldRenderer import JsonFieldRenderer
 from ..dialogs import ExportDialog
@@ -11,11 +12,13 @@ from ..dialogs import ExportDialog
 class ResultsView(Gtk.VBox):
 
     __gsignals__ = {
-        'update-request':
-        (GObject.SIGNAL_RUN_FIRST, None, (str, object, object, object)),
-        'selection-changed':
-        (GObject.SIGNAL_RUN_FIRST, None, (str, object, object)),
-        'notify-status': (GObject.SIGNAL_RUN_FIRST, None, (str, ))
+        "update-request": (
+            GObject.SIGNAL_RUN_FIRST,
+            None,
+            (str, object, object, object),
+        ),
+        "selection-changed": (GObject.SIGNAL_RUN_FIRST, None, (str, object, object)),
+        "notify-status": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
     }
 
     def __init__(self):
@@ -25,18 +28,18 @@ class ResultsView(Gtk.VBox):
         self._foreground_color = self._get_foreground()
         self.toolbar = Gtk.Toolbar()
 
-        self.first_page_btn = GtkUtil.tool_button(Gtk.STOCK_MEDIA_PREVIOUS,
-                                                  'First page',
-                                                  self._on_first_page)
-        self.prev_page_btn = GtkUtil.tool_button(Gtk.STOCK_MEDIA_REWIND,
-                                                 'Previous page',
-                                                 self._on_previous_page)
-        self.next_page_btn = GtkUtil.tool_button(Gtk.STOCK_MEDIA_FORWARD,
-                                                 'Next page',
-                                                 self._on_next_page)
-        self.last_page_btn = GtkUtil.tool_button(Gtk.STOCK_MEDIA_NEXT,
-                                                 'Last page',
-                                                 self._on_last_page)
+        self.first_page_btn = GtkUtil.tool_button(
+            Gtk.STOCK_MEDIA_PREVIOUS, "First page", self._on_first_page
+        )
+        self.prev_page_btn = GtkUtil.tool_button(
+            Gtk.STOCK_MEDIA_REWIND, "Previous page", self._on_previous_page
+        )
+        self.next_page_btn = GtkUtil.tool_button(
+            Gtk.STOCK_MEDIA_FORWARD, "Next page", self._on_next_page
+        )
+        self.last_page_btn = GtkUtil.tool_button(
+            Gtk.STOCK_MEDIA_NEXT, "Last page", self._on_last_page
+        )
 
         self.page_n = Gtk.Label()
         self.page_n.set_size_request(100, 20)
@@ -59,7 +62,7 @@ class ResultsView(Gtk.VBox):
         self.view = Gtk.TreeView()
         results_scroll = Gtk.ScrolledWindow()
         results_scroll.add(self.view)
-        self.view.connect('row-activated', self._on_row_selected)
+        self.view.connect("row-activated", self._on_row_selected)
 
         self.pack_start(results_scroll, True, True, 0)
 
@@ -73,7 +76,7 @@ class ResultsView(Gtk.VBox):
 
         # Value
         renderer = JsonFieldRenderer()
-        renderer.connect('field-edited', self._on_value_edited)
+        renderer.connect("field-edited", self._on_value_edited)
         column = Gtk.TreeViewColumn("Value", renderer)
         column.set_min_width(300)
         column.set_resizable(True)
@@ -89,8 +92,7 @@ class ResultsView(Gtk.VBox):
         column.set_cell_data_func(renderer, self._render_type)
         self.view.append_column(column)
 
-        self.view.get_selection().connect('changed',
-                                          self._on_selection_changed)
+        self.view.get_selection().connect("changed", self._on_selection_changed)
         self.set_model(Gtk.TreeStore(str, object))
         self._update_actions()
 
@@ -108,40 +110,47 @@ class ResultsView(Gtk.VBox):
 
     def _render_key(self, col, cell, model, iter, data):
         value = model.get(iter, 0)[0]
-        value = value if value is not None else ''
-        cell.set_property('text', str(value))
+        value = value if value is not None else ""
+        cell.set_property("text", str(value))
 
     def _render_value(self, col, cell, model, iter, data):
         value = model.get(iter, 1)[0]
-        value = value if value is not None else ''
-        if isinstance(value, (dict, list)): value = '(%s items)' % len(value)
+        value = value if value is not None else ""
+        if isinstance(value, (dict, list)):
+            value = "(%s items)" % len(value)
 
         if self._has_updates(iter):
-            cell.set_property('foreground', '#FF0000')
+            cell.set_property("foreground", "#FF0000")
         else:
-            cell.set_property('foreground', self._foreground_color)
+            cell.set_property("foreground", self._foreground_color)
 
-        cell.set_property('text', str(value))
-
+        cell.set_property("text", str(value))
 
     def _render_type(self, col, cell, model, iter, data):
         value = model.get(iter, 1)[0]
 
-        type_str = ''
-        if isinstance(value, str): type_str = 'String'
-        elif isinstance(value, bool): type_str = 'Boolean'
-        elif isinstance(value, int): type_str = 'Integer'
-        elif isinstance(value, dict): type_str = 'Object'
-        elif isinstance(value, list): type_str = 'Array'
-        elif value is None: type_str = 'Null'
-        else: type_str = str(type(value).__name__)
+        type_str = ""
+        if isinstance(value, str):
+            type_str = "String"
+        elif isinstance(value, bool):
+            type_str = "Boolean"
+        elif isinstance(value, int):
+            type_str = "Integer"
+        elif isinstance(value, dict):
+            type_str = "Object"
+        elif isinstance(value, list):
+            type_str = "Array"
+        elif value is None:
+            type_str = "Null"
+        else:
+            type_str = str(type(value).__name__)
 
         if self._has_updates(iter):
-            cell.set_property('foreground', '#FF0000')
+            cell.set_property("foreground", "#FF0000")
         else:
-            cell.set_property('foreground', self._foreground_color)
+            cell.set_property("foreground", self._foreground_color)
 
-        cell.set_property('text', type_str)
+        cell.set_property("text", type_str)
 
     def set_model(self, model):
         self.model = model
@@ -154,37 +163,34 @@ class ResultsView(Gtk.VBox):
         model, itr = self.view.get_selection().get_selected()
         collection = self.resultset.collection if self.resultset else None
 
-        self.emit('selection-changed', collection, model, itr)
+        self.emit("selection-changed", collection, model, itr)
         self._update_actions()
 
     def _update_actions(self, *args):
         has_data = self.resultset is not None
-        self.first_page_btn.set_sensitive(has_data
-                                          and self.resultset.has_first())
-        self.prev_page_btn.set_sensitive(has_data
-                                         and self.resultset.has_prev())
-        self.next_page_btn.set_sensitive(has_data
-                                         and self.resultset.has_next())
-        self.last_page_btn.set_sensitive(has_data
-                                         and self.resultset.has_last())
+        self.first_page_btn.set_sensitive(has_data and self.resultset.has_first())
+        self.prev_page_btn.set_sensitive(has_data and self.resultset.has_prev())
+        self.next_page_btn.set_sensitive(has_data and self.resultset.has_next())
+        self.last_page_btn.set_sensitive(has_data and self.resultset.has_last())
 
     def _update_page_and_count(self):
         if self.resultset:
-            self.totalcount.set_text('%s documents' % len(self.resultset))
+            self.totalcount.set_text("%s documents" % len(self.resultset))
             self.page_n.set_text(
-                'Page %s of %s' %
-                (self.resultset.page + 1, self.resultset.pages))
+                "Page %s of %s" % (self.resultset.page + 1, self.resultset.pages)
+            )
         else:
-            self.totalcount.set_text('%s documents' % 0)
-            self.page_n.set_text('Page %s of %s' % (0, 0))
+            self.totalcount.set_text("%s documents" % 0)
+            self.page_n.set_text("Page %s of %s" % (0, 0))
 
     def get_rowcount(self):
         return len(self.resultset)
 
     def set_result_set(self, resultset):
         self.resultset = resultset
-        if self.resultset.is_ready(): self._show_page()
-        self.resultset.connect('ready', self._on_data_ready)
+        if self.resultset.is_ready():
+            self._show_page()
+        self.resultset.connect("ready", self._on_data_ready)
 
     def _on_next_page(self, src):
         self.resultset.next_page()
@@ -200,7 +206,7 @@ class ResultsView(Gtk.VBox):
 
     def _show_page(self):
 
-        self.emit('notify-status', 'Building results view ...')
+        self.emit("notify-status", "Building results view ...")
 
         def _ready(model):
             GLib.idle_add(self._on_model_ready, model)
@@ -211,7 +217,7 @@ class ResultsView(Gtk.VBox):
         self.set_model(model)
         self._update_page_and_count()
         self._update_actions()
-        self.emit('notify-status', 'Done.')
+        self.emit("notify-status", "Done.")
 
     def _on_data_ready(self, src):
         GLib.idle_add(self._show_page)
@@ -241,8 +247,9 @@ class ResultsView(Gtk.VBox):
         model.set_value(itr, 1, new_value)
         model.set_value(itr, 2, True)
         path = ModelUtil.get_json_path(model, itr)
-        self.emit('update-request', self.resultset.collection, path[0],
-                  path[1:], new_value)
+        self.emit(
+            "update-request", self.resultset.collection, path[0], path[1:], new_value
+        )
 
     def clean_updates(self):
         model = self.view.get_model()

@@ -1,15 +1,22 @@
 import json
 from collections import OrderedDict
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from .connection import MongoConnection
 from .widgets.queryeditor import QueryEditor
 from .dialogs import ConnectionEditorDialog
 from .utils import GladeObject, Templates
-from .dialogs import (ConfirmDialog, AboutDialog, ConnectionEditorDialog,
-                            MessageDialog, ImportDialog, ExportDialog)
+from .dialogs import (
+    ConfirmDialog,
+    AboutDialog,
+    ConnectionEditorDialog,
+    MessageDialog,
+    ImportDialog,
+    ExportDialog,
+)
 from .widgets.connectionsview import ConnectionsView
 from .messages import MESSAGES as messages
 
@@ -20,22 +27,23 @@ class MainWindow(GladeObject):
 
         self.conn_view = ConnectionsView()
         self.conn_area.add(self.conn_view)
-        self.conn_view.connect('connection-selected',
-                               self._on_connection_selected)
-        self.conn_view.connect('connection-error', self._on_connection_error)
+        self.conn_view.connect("connection-selected", self._on_connection_selected)
+        self.conn_view.connect("connection-error", self._on_connection_error)
 
         self.build_main_pane()
         self.connection_tabs = []
 
         self.conn_view.set_actions(
-            OrderedDict([
-                (messages.BTN_NEW_EDITOR, ('connection', self._new_editor)),
-                (messages.BTN_SHOW_INDEXES, ('collection',
-                                             self._show_indexes)),
-                (messages.BTN_FIND_ALL, ('collection', self._find_all)),
-                (messages.BTN_IMPORT_DATA, (None, self._import_data)),
-                (messages.BTN_EXPORT_DATA, ('collection', self._export_data))
-            ]))
+            OrderedDict(
+                [
+                    (messages.BTN_NEW_EDITOR, ("connection", self._new_editor)),
+                    (messages.BTN_SHOW_INDEXES, ("collection", self._show_indexes)),
+                    (messages.BTN_FIND_ALL, ("collection", self._find_all)),
+                    (messages.BTN_IMPORT_DATA, (None, self._import_data)),
+                    (messages.BTN_EXPORT_DATA, ("collection", self._export_data)),
+                ]
+            )
+        )
 
     def build_main_pane(self):
         self.tabs = Gtk.Notebook()
@@ -69,7 +77,7 @@ class MainWindow(GladeObject):
         def _on_accept(src, name, data):
             self.conn_view.add_connection(name, data)
 
-        conn_editor.connect('accept', _on_accept)
+        conn_editor.connect("accept", _on_accept)
         conn_editor.show()
 
     def on_edit_connection(self, obj):
@@ -80,14 +88,13 @@ class MainWindow(GladeObject):
         def _on_accept(src, name, data):
             self.conn_view.update_connection(conn_obj, data)
 
-        conn_editor.connect('accept', _on_accept)
+        conn_editor.connect("accept", _on_accept)
         conn_editor.show(conn_obj.name, conn_obj.config)
 
     def on_remove_connection(self, obj):
         conn_obj = self.conn_view.get_selected_connection()
 
-        response = ConfirmDialog().show(messages.WARNING,
-                                        messages.CONFIRM_DELETE_CONN)
+        response = ConfirmDialog().show(messages.WARNING, messages.CONFIRM_DELETE_CONN)
 
         if response == Gtk.ResponseType.OK:
             self.conn_view.remove_connection(conn_obj)
@@ -101,8 +108,7 @@ class MainWindow(GladeObject):
         box = Gtk.HBox(False, 3)
         label = Gtk.Label.new(conn_obj.name)
         box.pack_start(label, True, True, 0)
-        button = Gtk.Button.new_from_icon_name(Gtk.STOCK_CLOSE,
-                                               Gtk.IconSize.BUTTON)
+        button = Gtk.Button.new_from_icon_name(Gtk.STOCK_CLOSE, Gtk.IconSize.BUTTON)
         box.pack_start(button, False, False, 0)
         box.show_all()
 
@@ -111,13 +117,14 @@ class MainWindow(GladeObject):
         def _close_editor(src, idx):
             self.tabs.remove_page(idx)
 
-        button.connect('clicked', _close_editor, index)
+        button.connect("clicked", _close_editor, index)
         self.tabs.append_page(tab, box)
         self.connection_tabs.append(tab)
 
         self.tabs.set_current_page(index)
 
-        if collection: self._find_all()
+        if collection:
+            self._find_all()
 
     def _new_editor(self, *args):
         conn_obj = self.conn_view.get_selected_connection()
@@ -143,7 +150,8 @@ class MainWindow(GladeObject):
 
     def _insert_in_current_editor(self, text):
         tab = self.get_selected_tab()
-        if tab: tab.buffer.set_text(text)
+        if tab:
+            tab.buffer.set_text(text)
 
     def _on_connection_error(self, src, conn, error):
         MessageDialog().show(messages.ERROR, messages.ERROR_CONNECTING % error)

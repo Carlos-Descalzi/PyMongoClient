@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, GtkUtil
 
@@ -9,9 +10,9 @@ class FieldEditorDialog(GladeObject):
     def __init__(self):
         GladeObject.__init__(self, "ui/FieldEditDialog.glade")
 
-    __gsignals__ = {'accept': (GObject.SIGNAL_RUN_FIRST, None, ())}
+    __gsignals__ = {"accept": (GObject.SIGNAL_RUN_FIRST, None, ())}
 
-    def show(self, field_name='', field_value='', disable_name=False):
+    def show(self, field_name="", field_value="", disable_name=False):
         self.field_name.set_text(field_name)
 
         if disable_name:
@@ -30,7 +31,7 @@ class FieldEditorDialog(GladeObject):
             self.field_value.get_buffer().set_text(str(field_value))
         self._on_field_type_change()
 
-        self.field_type.connect('changed', self._on_field_type_change)
+        self.field_type.connect("changed", self._on_field_type_change)
 
         self.editor_dialog.show()
 
@@ -53,13 +54,17 @@ class FieldEditorDialog(GladeObject):
     def get_field_value(self):
         item = self.field_type.get_active()
 
-        if item == 0: return None
-        elif item == 1: return self.field_boolean_value.get_active()
-        elif item == 2: return int(self.field_value.get_buffer().get_text())
-        else: return GtkUtil.get_text(self.field_value)
+        if item == 0:
+            return None
+        elif item == 1:
+            return self.field_boolean_value.get_active()
+        elif item == 2:
+            return int(self.field_value.get_buffer().get_text())
+        else:
+            return GtkUtil.get_text(self.field_value)
 
     def _on_accept(self, *args):
-        self.emit('accept')
+        self.emit("accept")
         self.editor_dialog.destroy()
 
     def _on_cancel(self, *args):
