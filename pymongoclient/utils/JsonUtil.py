@@ -1,4 +1,3 @@
-
 import json
 from bson.int64 import Int64
 from bson.objectid import ObjectId
@@ -17,11 +16,14 @@ class _CustomJsonEncoder(json.JSONEncoder):
 def dump(obj, fp, **kwargs):
     json.dump(obj, fp, cls=_CustomJsonEncoder, **kwargs)
 
+
 def loads(string):
     return json.loads(string)
 
+
 def dumps(obj, **kwargs):
     return json.dumps(obj, cls=_CustomJsonEncoder, **kwargs)
+
 
 def dumpf(obj, fname, **kwargs):
     with open(fname, "w") as f:

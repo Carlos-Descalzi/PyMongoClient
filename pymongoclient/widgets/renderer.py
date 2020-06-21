@@ -1,4 +1,4 @@
-__all__ = ['JsonFieldRenderer']
+__all__ = ["JsonFieldRenderer"]
 import gi
 
 gi.require_version("Gtk", "3.0")

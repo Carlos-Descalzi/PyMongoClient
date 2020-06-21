@@ -9,7 +9,6 @@ from bson.objectid import ObjectId
 from threading import Thread
 
 
-
 def build_document_model(cursor):
     model = Gtk.TreeStore(object, object, bool)
     for obj in cursor:
@@ -25,6 +24,7 @@ def build_document_model(cursor):
             parent = model.append(None, (None, obj, False))
     return model
 
+
 def build_document_model_async(cursor, callback):
     def _run():
         model = build_document_model(cursor)
@@ -32,6 +32,7 @@ def build_document_model_async(cursor, callback):
 
     thread = Thread(target=_run)
     thread.start()
+
 
 def do_append_obj(model, obj, parent):
     for key, val in list(obj.items()):
@@ -49,8 +50,10 @@ def do_append_obj(model, obj, parent):
         else:
             print("Unknown value", type(val), val)
 
+
 def _is_primitive(val):
     return val is None or isinstance(val, (str, int, bool, datetime, ObjectId))
+
 
 def get_json_path(model, itr):
     path = []
@@ -58,6 +61,7 @@ def get_json_path(model, itr):
         path.insert(0, model.get_value(itr, 0))
         itr = model.iter_parent(itr)
     return path
+
 
 def root(model, itr):
     parent = model.iter_parent(itr)
@@ -67,6 +71,7 @@ def root(model, itr):
         parent = model.iter_parent(itr)
 
     return itr
+
 
 class _ModelIterator:
     def __init__(self, model):
@@ -84,6 +89,7 @@ class _ModelIterator:
         itr = self.itr
         self.itr = self.model.iter_next(self.itr)
         return itr
+
 
 def iterator(model):
     return _ModelIterator(model)
