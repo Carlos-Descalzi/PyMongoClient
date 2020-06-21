@@ -1,10 +1,9 @@
-import json
-from collections import OrderedDict
 import gi
-
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
-from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
+from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
+import json
+from collections import OrderedDict
 from .connection import MongoConnection
 from .widgets.queryeditor import QueryEditor
 from .dialogs import ConnectionEditorDialog
@@ -17,7 +16,7 @@ from .dialogs import (
     ImportDialog,
     ExportDialog,
 )
-from .widgets.connectionsview import ConnectionsView
+from .widgets import ConnectionsView
 from .messages import MESSAGES as messages
 
 
@@ -48,7 +47,10 @@ class MainWindow(GladeObject):
     def build_main_pane(self):
         self.tabs = Gtk.Notebook()
         self.MainPane.add2(self.tabs)
-        self.MainPane.set_position(200)
+
+    def adjust_to_size(self):
+        position = int(Gdk.Screen.width() * 0.25)
+        self.MainPane.set_position(position)
 
     def on_exit(self, obj):
         self.exit()
@@ -161,4 +163,5 @@ class MainWindow(GladeObject):
 
     def run_main(self):
         self.show()
+        self.adjust_to_size()
         Gtk.main()

@@ -10,7 +10,6 @@ class GladeObject(GObject.GObject):
     def __init__(self, filename):
         GObject.GObject.__init__(self)
         self._builder = Gtk.Builder()
-        print(filename, locate_in_modules(filename))
         self._builder.add_from_file(locate_in_modules(filename))
         self._builder.connect_signals(self)
 

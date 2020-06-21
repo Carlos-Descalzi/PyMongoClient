@@ -24,7 +24,7 @@ class SubprocessHandler(metaclass=ABCMeta):
     def _run(self, commands):
 
         for command in commands:
-            self.log("Running command: %s" % " ".join(command))
+            self.log(f"Running command: {' '.join(command)}")
             try:
                 self._pipe = Popen(command, stdout=PIPE, stderr=PIPE)
 
@@ -45,10 +45,10 @@ class SubprocessHandler(metaclass=ABCMeta):
 
                     time.sleep(0.1)
 
-                self.log("Exited with return code %s" % return_code)
+                self.log(f"Exited with return code {return_code}")
 
             except Exception as e:
-                self.log("Error exporting: %s" % e)
+                self.log(f"Error exporting: {e}")
 
         self.finish()
 

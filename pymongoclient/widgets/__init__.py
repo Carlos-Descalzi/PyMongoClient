@@ -1,1 +1,2 @@
-from .JsonFieldRenderer import JsonFieldRenderer
+from .renderer import JsonFieldRenderer
+from .connections import ConnectionsView

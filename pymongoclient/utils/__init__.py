@@ -1,7 +1,7 @@
 from . import GtkUtil
 from . import Templates
+from . import JsonUtil
+from . import ModelUtil
 
-from .ModelUtil import *
-from .GladeObject import GladeObject
-from .JsonUtil import *
+from .glade import GladeObject
 from .job import SubprocessHandler
