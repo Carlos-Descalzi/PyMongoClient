@@ -14,6 +14,7 @@ import uuid
 import tempfile
 import runpy
 import pymongo.cursor
+from pymongo.command_cursor import CommandCursor
 from ..messages import MESSAGES as messages
 
 QUERY_TEMPLATE = """
@@ -221,9 +222,14 @@ class QueryEditor(Gtk.VBox):
                 resultset = script_globals["resultset"]
 
                 if isinstance(resultset, pymongo.cursor.Cursor):
+                    print(1)
                     resultset = CursorResultSet(resultset, None)
+                elif isinstance(resultset, CommandCursor):
+                    resultset = ListResultSet(list(resultset), "", None)
                 else:
+                    print(2)
                     if not isinstance(resultset, list):
+                        print(3)
                         resultset = [resultset]
                     resultset = ListResultSet(resultset, "", None)
 

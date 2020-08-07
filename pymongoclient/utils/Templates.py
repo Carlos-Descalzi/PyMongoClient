@@ -4,12 +4,16 @@ from bson.objectid import ObjectId
 
 def find_all(collection_name):
     collection_name = _python_friendly(collection_name)
-    return "resultset = db%s.find({})" % collection_name
+    return f"""#
+# Use python syntax to perform the queries
+# Global variable resultset is where results are stored to be displayed in the tree below.
+#
+resultset = db{collection_name}.find({{}})"""
 
 
 def indexes(collection_name):
     collection_name = _python_friendly(collection_name)
-    return "resultset = db%s.index_information()" % collection_name
+    return f"resultset = db{collection_name}.index_information()"
 
 
 def make_path(field_path):

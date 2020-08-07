@@ -4,7 +4,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, GtkUtil, SubprocessHandler, ModelUtil
-import pymongoclient.messages as messages
+from pymongoclient.messages import MESSAGES as messages
 import json
 
 

@@ -136,6 +136,8 @@ class ResultsView(Gtk.VBox):
             type_str = "Boolean"
         elif isinstance(value, int):
             type_str = "Integer"
+        elif isinstance(value, float):
+            type_str = "Double"
         elif isinstance(value, dict):
             type_str = "Object"
         elif isinstance(value, list):

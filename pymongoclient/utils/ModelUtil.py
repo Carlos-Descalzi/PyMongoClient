@@ -52,7 +52,7 @@ def do_append_obj(model, obj, parent):
 
 
 def _is_primitive(val):
-    return val is None or isinstance(val, (str, int, bool, datetime, ObjectId))
+    return val is None or isinstance(val, (str, int, bool, float, datetime, ObjectId))
 
 
 def get_json_path(model, itr):
