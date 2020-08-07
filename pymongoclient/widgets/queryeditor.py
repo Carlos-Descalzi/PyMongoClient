@@ -222,14 +222,11 @@ class QueryEditor(Gtk.VBox):
                 resultset = script_globals["resultset"]
 
                 if isinstance(resultset, pymongo.cursor.Cursor):
-                    print(1)
                     resultset = CursorResultSet(resultset, None)
                 elif isinstance(resultset, CommandCursor):
                     resultset = ListResultSet(list(resultset), "", None)
                 else:
-                    print(2)
                     if not isinstance(resultset, list):
-                        print(3)
                         resultset = [resultset]
                     resultset = ListResultSet(resultset, "", None)
 
