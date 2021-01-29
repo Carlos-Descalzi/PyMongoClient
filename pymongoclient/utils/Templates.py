@@ -35,7 +35,7 @@ def update(field_path, value):
 
 def _python_friendly(collection_name):
     if not re.match("^[a-zA-Z_][0-9a-zA-Z_]+$", collection_name):
-        return "['{collection_name}']"
+        return f"['{collection_name}']"
     return f".{collection_name}"
 
 
