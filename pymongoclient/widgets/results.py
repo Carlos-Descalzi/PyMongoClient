@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
-from ..utils import GtkUtil, ModelUtil
+from ..utils import gtkutil, modelutil
 from .connections import ConnectionsView
 from .renderer import JsonFieldRenderer
 from ..dialogs import ExportDialog
@@ -28,16 +28,16 @@ class ResultsView(Gtk.VBox):
         self._foreground_color = self._get_foreground()
         self.toolbar = Gtk.Toolbar()
 
-        self.first_page_btn = GtkUtil.tool_button(
+        self.first_page_btn = gtkutil.tool_button(
             Gtk.STOCK_MEDIA_PREVIOUS, "First page", self._on_first_page
         )
-        self.prev_page_btn = GtkUtil.tool_button(
+        self.prev_page_btn = gtkutil.tool_button(
             Gtk.STOCK_MEDIA_REWIND, "Previous page", self._on_previous_page
         )
-        self.next_page_btn = GtkUtil.tool_button(
+        self.next_page_btn = gtkutil.tool_button(
             Gtk.STOCK_MEDIA_FORWARD, "Next page", self._on_next_page
         )
-        self.last_page_btn = GtkUtil.tool_button(
+        self.last_page_btn = gtkutil.tool_button(
             Gtk.STOCK_MEDIA_NEXT, "Last page", self._on_last_page
         )
 
@@ -213,7 +213,7 @@ class ResultsView(Gtk.VBox):
         def _ready(model):
             GLib.idle_add(self._on_model_ready, model)
 
-        ModelUtil.build_document_model_async(self.resultset.pagedata, _ready)
+        modelutil.build_document_model_async(self.resultset.pagedata, _ready)
 
     def _on_model_ready(self, model):
         self.set_model(model)
@@ -248,7 +248,7 @@ class ResultsView(Gtk.VBox):
         model = self.view.get_model()
         model.set_value(itr, 1, new_value)
         model.set_value(itr, 2, True)
-        path = ModelUtil.get_json_path(model, itr)
+        path = modelutil.get_json_path(model, itr)
         self.emit(
             "update-request", self.resultset.collection, path[0], path[1:], new_value
         )
@@ -256,7 +256,7 @@ class ResultsView(Gtk.VBox):
     def clean_updates(self):
         model = self.view.get_model()
 
-        for itr in ModelUtil.iterator(model):
+        for itr in modelutil.iterator(model):
             model.set_value(itr, 2, False)
 
     def add_array_field(self, itr, value):

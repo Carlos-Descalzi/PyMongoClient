@@ -4,7 +4,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
 from ..connection import MongoConnection, CursorResultSet, ListResultSet
-from ..utils import GtkUtil, ModelUtil, JsonUtil
+from ..utils import gtkutil, modelutil, JsonUtil
 from ..dialogs import ExportDialog, FieldEditorDialog, ConfirmDialog
 from ..widgets.results import ResultsView
 from ..crud import UpdatesHandler
@@ -33,7 +33,7 @@ class QueryEditor(Gtk.VBox):
         self._updates = UpdatesHandler()
 
         toolbar = Gtk.Toolbar()
-        self.execute_btn = GtkUtil.tool_button(
+        self.execute_btn = gtkutil.tool_button(
             Gtk.STOCK_EXECUTE, messages.BTN_EXECUTE, self._on_execute
         )
         toolbar.insert(self.execute_btn, -1)
@@ -84,28 +84,28 @@ class QueryEditor(Gtk.VBox):
 
     ####
     def build_results_actions(self):
-        self.save_btn = GtkUtil.tool_button(
+        self.save_btn = gtkutil.tool_button(
             Gtk.STOCK_SAVE, messages.BTN_EXPORT_DATA, self._save_results
         )
-        self.flush_updates_btn = GtkUtil.tool_button(
+        self.flush_updates_btn = gtkutil.tool_button(
             Gtk.STOCK_APPLY, messages.BTN_APPLY_UPDATES, self._on_flush_updates
         )
-        self.edit_val_btn = GtkUtil.tool_button(
+        self.edit_val_btn = gtkutil.tool_button(
             Gtk.STOCK_EDIT, messages.BTN_EDIT_VALUE, self._on_edit_val
         )
-        self.add_val_btn = GtkUtil.tool_button(
+        self.add_val_btn = gtkutil.tool_button(
             Gtk.STOCK_ADD, messages.BTN_ADD_ITEM, self._on_add_field
         )
-        self.remove_val_btn = GtkUtil.tool_button(
+        self.remove_val_btn = gtkutil.tool_button(
             Gtk.STOCK_REMOVE, messages.BTN_REMOVE_ITEM, self._on_remove_field
         )
-        self.copy_json_doc_btn = GtkUtil.tool_button(
+        self.copy_json_doc_btn = gtkutil.tool_button(
             Gtk.STOCK_COPY, messages.BTN_COPY_JSON, self._on_copy_document_as_json
         )
-        self.copy_python_doc_btn = GtkUtil.tool_button(
+        self.copy_python_doc_btn = gtkutil.tool_button(
             Gtk.STOCK_COPY, messages.BTN_COPY_PYTHON, self._on_copy_document_as_python
         )
-        self.delete_doc_btn = GtkUtil.tool_button(
+        self.delete_doc_btn = gtkutil.tool_button(
             Gtk.STOCK_DELETE, messages.BTN_DELETE_DOCUMENT, self._on_delete_document
         )
 
@@ -128,7 +128,7 @@ class QueryEditor(Gtk.VBox):
 
     def _on_edit_val(self, *args):
         model, itr = self.results.get_selection()
-        path = ModelUtil.get_json_path(model, itr)
+        path = modelutil.get_json_path(model, itr)
         value = model.get_value(itr, 1)
 
     def _gen_clear_statement(self, *args):
@@ -149,7 +149,7 @@ class QueryEditor(Gtk.VBox):
                 value = model.get_value(itr, 1)
                 can_add = isinstance(value, (dict, list))
                 can_edit = not isinstance(value, (dict, list, ObjectId))
-                path = ModelUtil.get_json_path(model, itr)
+                path = modelutil.get_json_path(model, itr)
                 can_remove = rowcount > 0 and len(path) > 1
             else:
                 can_add = False
@@ -182,7 +182,7 @@ class QueryEditor(Gtk.VBox):
         self._allow_execute()
 
     def feed_log(self, line):
-        GtkUtil.text_buffer_append(self.log.get_buffer(), line)
+        gtkutil.text_buffer_append(self.log.get_buffer(), line)
         self.results_tab.set_current_page(1)
         self._allow_execute()
 
@@ -206,7 +206,7 @@ class QueryEditor(Gtk.VBox):
 
     def _on_execute(self, src):
 
-        query = GtkUtil.get_text(self.code_view)
+        query = gtkutil.get_text(self.code_view)
         self.execute_btn.set_sensitive(False)
 
         def statement(db):
@@ -245,7 +245,7 @@ class QueryEditor(Gtk.VBox):
     def _on_add_field(self, src):
 
         model, itr = self.results.get_selection()
-        path = ModelUtil.get_json_path(model, itr)
+        path = modelutil.get_json_path(model, itr)
         doc_id = path[0]
         path = path[1:]
         value = model.get_value(itr, 1)
@@ -272,7 +272,7 @@ class QueryEditor(Gtk.VBox):
 
     def _on_remove_field(self, src):
         model, itr = self.results.get_selection()
-        path = ModelUtil.get_json_path(model, itr)
+        path = modelutil.get_json_path(model, itr)
         doc_id = path[0]
         path = path[1:]
         key = model.get_value(itr, 0)
@@ -321,7 +321,7 @@ class QueryEditor(Gtk.VBox):
     def _on_delete_document(self, src, *args):
         collection = self.results.get_collection()
         model, itr = self.results.get_selection()
-        path = ModelUtil.get_json_path(model, itr)
+        path = modelutil.get_json_path(model, itr)
         doc_id = path[0]
 
         response = ConfirmDialog().show(messages.CONFIRM, messages.CONFIRM_DELETE)
@@ -332,7 +332,7 @@ class QueryEditor(Gtk.VBox):
                 db[collection].delete_one({"_id": doc_id})
 
             self._do_execute_statement(statement)
-            self.results.remove(ModelUtil.root(model, itr))
+            self.results.remove(modelutil.root(model, itr))
 
     def _on_flush_updates(self, *args):
         sentences = self._updates.build_sentences()

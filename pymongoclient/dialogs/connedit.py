@@ -4,7 +4,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 import re
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from ..utils import GladeObject, ModelUtil
+from ..utils import GladeObject, modelutil
 
 HOST_PATTERN = "^[a-zA-Z0-9\\.\\-\\+_]+$"
 PORT_PATTERN = "^[1-9][0-9]+$"
@@ -131,7 +131,7 @@ class ConnectionEditorDialog(GladeObject):
 
         model = self.replicaset.get_model()
 
-        for itr in ModelUtil.iterator(model):
+        for itr in modelutil.iterator(model):
             connection.append(
                 {"host": model.get_value(itr, 0), "port": model.get_value(itr, 1)}
             )

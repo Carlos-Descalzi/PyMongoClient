@@ -1,5 +1,5 @@
 from collections import OrderedDict, defaultdict
-from ..utils import Templates
+from ..utils import templates
 
 
 class OperationSet:
@@ -30,7 +30,7 @@ class Path:
         return self.path == other.path
 
     def path_str(self):
-        return Templates.make_path(self.path)
+        return templates.make_path(self.path)
 
     def __hash__(self):
         return hash(".".join(map(str, self.path)))

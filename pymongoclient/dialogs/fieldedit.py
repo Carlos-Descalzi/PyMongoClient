@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from ..utils import GladeObject, GtkUtil
+from ..utils import GladeObject, gtkutil
 
 
 class FieldEditorDialog(GladeObject):
@@ -61,7 +61,7 @@ class FieldEditorDialog(GladeObject):
         elif item == 2:
             return int(self.field_value.get_buffer().get_text())
         else:
-            return GtkUtil.get_text(self.field_value)
+            return gtkutil.get_text(self.field_value)
 
     def _on_accept(self, *args):
         self.emit("accept")

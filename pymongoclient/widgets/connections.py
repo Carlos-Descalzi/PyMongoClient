@@ -5,7 +5,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib, Gdk
 from ..connection import MongoConnection
-from ..utils import GtkUtil, ModelUtil
+from ..utils import gtkutil, modelutil
 import json
 import os
 import os.path
@@ -192,7 +192,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
 
     def _get_conn_iter(self, conn):
         model = self.view.get_model()
-        for itr in ModelUtil.iterator(model):
+        for itr in modelutil.iterator(model):
             if model.get_value(itr, 0) == conn:
                 return model, itr
         return model, None
@@ -209,7 +209,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
             self._add_menu_item(label, target, action)
 
     def _add_menu_item(self, label, target, handler):
-        item = GtkUtil.menu_item(label, handler)
+        item = gtkutil.menu_item(label, handler)
         self._menu_actions[label] = (target, item)
         self.menu.append(item)
 

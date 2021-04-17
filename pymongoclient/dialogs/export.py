@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from ..utils import GladeObject, GtkUtil, SubprocessHandler, ModelUtil
+from ..utils import GladeObject, gtkutil, SubprocessHandler, modelutil
 from pymongoclient.messages import MESSAGES as messages
 import json
 
@@ -131,7 +131,7 @@ class ExportDialog(GladeObject):
             ),
         )
 
-        dialog.add_filter(GtkUtil.file_filter(["*.json", "*.csv"]))
+        dialog.add_filter(gtkutil.file_filter(["*.json", "*.csv"]))
 
         if dialog.run() == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
@@ -170,7 +170,7 @@ class ExportDialog(GladeObject):
         fields = []
         all_fields = False
 
-        for i, itr in enumerate(ModelUtil.iterator(model)):
+        for i, itr in enumerate(modelutil.iterator(model)):
             if i == 0:
                 if model.get_value(itr, 0):
                     all_fields = True
@@ -212,7 +212,7 @@ class ExportDialog(GladeObject):
         self._exporter.start()
 
     def write_log(self, message):
-        GLib.idle_add(GtkUtil.text_view_append, self.log, message)
+        GLib.idle_add(gtkutil.text_view_append, self.log, message)
 
     def finish(self):
         self._running = False

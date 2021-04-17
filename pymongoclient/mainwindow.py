@@ -8,7 +8,7 @@ from collections import OrderedDict
 from .connection import MongoConnection
 from .widgets.queryeditor import QueryEditor
 from .dialogs import ConnectionEditorDialog
-from .utils import GladeObject, Templates
+from .utils import GladeObject, templates
 from .dialogs import (
     ConfirmDialog,
     AboutDialog,
@@ -135,11 +135,11 @@ class MainWindow(GladeObject):
 
     def _show_indexes(self, *args):
         _, coll = tuple(self.conn_view.get_selected_path())
-        self._insert_in_current_editor(Templates.indexes(coll))
+        self._insert_in_current_editor(templates.indexes(coll))
 
     def _find_all(self, *args):
         _, coll = tuple(self.conn_view.get_selected_path())
-        self._insert_in_current_editor(Templates.find_all(coll))
+        self._insert_in_current_editor(templates.find_all(coll))
 
     def _import_data(self, *args):
         selection = self.conn_view.get_selected_path()

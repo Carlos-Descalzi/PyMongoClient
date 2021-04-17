@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
-from ..utils import GladeObject, JsonUtil, GtkUtil
+from ..utils import GladeObject, JsonUtil, gtkutil
 from ..utils import SubprocessHandler
 import tempfile
 
@@ -70,7 +70,7 @@ class ImportDialog(GladeObject):
         self._collection = collection
         self._running = False
         self.file_name.add_filter(
-            GtkUtil.file_filter(["*.json", "*.csv", "*.json.gz", "*.csv.gz"])
+            gtkutil.file_filter(["*.json", "*.csv", "*.json.gz", "*.csv.gz"])
         )
 
     def show(self):
@@ -161,7 +161,7 @@ class ImportDialog(GladeObject):
         self._importer.start()
 
     def write_log(self, message):
-        GLib.idle_add(GtkUtil.text_view_append, self.log, message)
+        GLib.idle_add(gtkutil.text_view_append, self.log, message)
 
     def finish(self):
         self._running = False
