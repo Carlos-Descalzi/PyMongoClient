@@ -6,51 +6,8 @@ from gi.repository import Gtk, GObject, GtkSource, Pango, GLib
 from ..utils import GladeObject, gtkutil, SubprocessHandler, modelutil
 from pymongoclient.messages import MESSAGES as messages
 import json
-
-
-class Exporter(SubprocessHandler):
-    def __init__(self, listener, connection, collection, filename):
-        SubprocessHandler.__init__(self, listener)
-        self._connection = connection
-        self._collection = collection
-        self._filename = filename
-        self.file_format = "json"
-        self.header_line = False
-        self.pretty_print = False
-        self.array = False
-        self.fields = []
-        self.gzip = False
-        self.query = {}
-
-    def _build_command_lines(self):
-
-        query_str = json.dumps(self.query or {}).replace('"', '\\"')
-
-        command = [
-            "mongoexport",
-            "--uri=%s" % self._connection.build_uri(),
-            "-c=%s" % self._collection,
-            '-q="%s"' % query_str,
-            "--type=%s" % self.file_format,
-            "-o=%s" % self._filename,
-        ]
-
-        if self.file_format == "json":
-            if self.pretty_print:
-                command += ["--pretty"]
-            if self.array:
-                command += ["--jsonArray"]
-        else:
-            if not self.header_line:
-                command += ["--noHeaderLine"]
-            command += ["--fields=%s" % ",".join(self.fields)]
-
-        commands = [command]
-
-        if self.gzip:
-            commands += [["gzip", self._filename]]
-
-        return commands
+from pymongoclient.connection.export.csv import CsvExporter
+from pymongoclient.connection.export.json import JsonExporter
 
 
 class ExportDialog(GladeObject):
@@ -86,9 +43,7 @@ class ExportDialog(GladeObject):
             l = len(self._resultset.resultset)
             row = data[0]
 
-            fields = sorted(
-                list(set([".".join(x) for x in self._do_extract_fields([], row)]))
-            )
+            fields = sorted(list(set([".".join(x) for x in self._do_extract_fields([], row)])))
 
             fields = [(True, "Select all")] + [(False, x) for x in fields]
             for field in fields:
@@ -123,12 +78,7 @@ class ExportDialog(GladeObject):
             messages.SAVE_FILE_DIALOG,
             self.dialog,
             Gtk.FileChooserAction.SAVE,
-            (
-                Gtk.STOCK_CANCEL,
-                Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_SAVE,
-                Gtk.ResponseType.OK,
-            ),
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK,),
         )
 
         dialog.add_filter(gtkutil.file_filter(["*.json", "*.csv"]))
@@ -184,32 +134,18 @@ class ExportDialog(GladeObject):
         self._running = True
 
         filename = self.file_name.get_text()
+        self._exporter = self._get_exporter()
+        self._exporter.export(filename)
 
-        self._exporter = Exporter(
-            self,
-            self._connection,
-            self._collection or self._resultset.resultset.collection,
-            filename,
-        )
+    def _get_exporter(self, file_type):
+        file_type = self.export_type_tab.get_current_page()
 
-        types = ["json", "csv"]
+        if file_type == TYPE_JSON:
+            exporter = JsonExporter(self._resultset.resultset)
+        else:
+            exporter = CsvExporter(self._resultset.resultset)
 
-        self._exporter.file_format = types[self.export_type_tab.get_current_page()]
-        self._exporter.header_line = self.header_line.get_active()
-        self._exporter.fields = self._get_fields()
-        self._exporter.pretty_print = self.pretty_print.get_active()
-        self._exporter.array = self.record_layout_json.get_active()
-        self._exporter.gzip = self.gzip.get_active()
-
-        if self._resultset:
-            args, _ = self._resultset.resultset.last_op.args()
-            query = args[0]
-            self._exporter.query = query
-
-        self._update_actions()
-        self.main_tabs.set_current_page(1)
-
-        self._exporter.start()
+        return exporter
 
     def write_log(self, message):
         GLib.idle_add(gtkutil.text_view_append, self.log, message)

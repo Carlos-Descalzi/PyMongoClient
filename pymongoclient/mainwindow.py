@@ -37,6 +37,7 @@ class MainWindow(GladeObject):
             OrderedDict(
                 [
                     (messages.BTN_NEW_EDITOR, ("connection", self._new_editor)),
+                    (messages.BTN_REFRESH, ("connection", self._refresh_list)),
                     (messages.BTN_SHOW_INDEXES, ("collection", self._show_indexes)),
                     (messages.BTN_FIND_ALL, ("collection", self._find_all)),
                     (messages.BTN_IMPORT_DATA, (None, self._import_data)),
@@ -115,13 +116,12 @@ class MainWindow(GladeObject):
         box.pack_start(button, False, False, 0)
         box.show_all()
 
-        index = self.tabs.get_n_pages()
-
-        def _close_editor(src, idx):
+        def _close_editor(src, *_):
+            idx = self.tabs.page_num(tab)
             self.tabs.remove_page(idx)
 
-        button.connect("clicked", _close_editor, index)
-        self.tabs.append_page(tab, box)
+        button.connect("clicked", _close_editor)
+        index = self.tabs.append_page(tab, box)
         self.connection_tabs.append(tab)
 
         self.tabs.set_current_page(index)
@@ -132,6 +132,11 @@ class MainWindow(GladeObject):
     def _new_editor(self, *args):
         conn_obj = self.conn_view.get_selected_connection()
         self._on_connection_selected(None, conn_obj)
+
+    def _refresh_list(self, *args):
+        conn_obj = self.conn_view.get_selected_connection()
+        self.conn_view.refresh(conn_obj)
+        # conn_obj.refresh()
 
     def _show_indexes(self, *args):
         _, coll = tuple(self.conn_view.get_selected_path())

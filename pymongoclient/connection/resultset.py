@@ -106,6 +106,14 @@ class CursorResultSet(ResultSet):
         self.data.rewind()
         self.pagedata = list(self.data[self.page * 20 : (self.page + 1) * 20])
 
+    def __iter__(self):
+        self.data.rewind()
+        return iter(self.data)
+
+    def get_cursor(self):
+        self.data.rewind()
+        return self.data
+
     def generator(self):
         self.data.rewind()
         for i in range(self.totalsize):

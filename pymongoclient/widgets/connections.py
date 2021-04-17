@@ -34,9 +34,7 @@ class ConnectionsView(Gtk.ScrolledWindow):
         self.menu = Gtk.Menu()
 
         self._add_menu_item(messages.MN_ITEM_CONNECT, "connection", self._on_connect)
-        self._add_menu_item(
-            messages.MN_ITEM_DISCONNECT, "connection", self._on_disconnect
-        )
+        self._add_menu_item(messages.MN_ITEM_DISCONNECT, "connection", self._on_disconnect)
 
         self.view.connect("button_press_event", self._on_button_press_event)
 
@@ -178,17 +176,26 @@ class ConnectionsView(Gtk.ScrolledWindow):
             self.emit("connection-selected", conn_obj, value)
 
     def _conn_connected(self, conn):
-        def _load_collections():
-            model, itr = self._get_conn_iter(conn)
-            db = conn.get_db()
+        GLib.idle_add(lambda: self._load_collections(conn))
 
-            for coll in sorted(db.collection_names()):
-                model.append(itr, [coll])
+    def _load_collections(self, conn):
+        model, itr = self._get_conn_iter(conn)
 
-            path = model.get_path(itr)
-            self.view.expand_row(path, True)
+        child = model.iter_children(itr)
+        while child:
+            model.remove(child)
+            child = model.iter_children(itr)
 
-        GLib.idle_add(_load_collections)
+        db = conn.get_db()
+
+        for coll in sorted(db.collection_names()):
+            model.append(itr, [coll])
+
+        path = model.get_path(itr)
+        self.view.expand_row(path, True)
+
+    def refresh(self, conn):
+        GLib.idle_add(lambda: self._load_collections(conn))
 
     def _get_conn_iter(self, conn):
         model = self.view.get_model()
@@ -228,18 +235,12 @@ class ConnectionsView(Gtk.ScrolledWindow):
                 target, menu_item = item
 
                 if label == "Connect":
-                    menu_item.set_sensitive(
-                        len(path) == 1 and not path[0].is_connected()
-                    )
+                    menu_item.set_sensitive(len(path) == 1 and not path[0].is_connected())
                 else:
                     if target == "connection":
-                        menu_item.set_sensitive(
-                            len(path) == 1 and path[0].is_connected()
-                        )
+                        menu_item.set_sensitive(len(path) == 1 and path[0].is_connected())
                     elif target == "collection":
-                        menu_item.set_sensitive(
-                            len(path) == 2 and path[0].is_connected()
-                        )
+                        menu_item.set_sensitive(len(path) == 2 and path[0].is_connected())
                     else:
                         menu_item.set_sensitive(True)
         else:
